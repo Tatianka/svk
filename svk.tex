@@ -4,6 +4,9 @@
 %% \documentclass{svk_long_en}
 \usepackage{mathrsfs}
 \usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage[shortlabels]{enumitem}
 
 %definície pre foju
 %\newtheorem{veta}{Veta}[section] 
@@ -64,7 +67,7 @@ Regulárne výrazy implementované v súčasných programovacích jazykoch ponú
 \section{Úvod}
 Regulárne výrazy vznikli v 60tych rokoch v teórii jazykov ako ďalší model na vyjadrenie regulárnych jazykov. Z takéhoto popisu ľudský mozog rýchlejšie pochopil o aký jazyk sa jedná, než zo zápisu konečného automatu, či regulárnej gramatiky. Ďalšou výhodou bol kratší a kompaktný zápis.
 
-Vďaka týmto vlastnostiam boli implementované ako vyhľadávací nástroj. Postupom času sa iniciatívou používateľov s vyššími nárokmi pridávali nové konštrukcie na uľahčenie práce. Nástroj takto rozvíjali až do dnešnej podoby. My sa budeme opierať o špecifikáciu regulárnych výrazov v jazyku Python\ref{Python3Documentation}.
+Vďaka týmto vlastnostiam boli implementované ako vyhľadávací nástroj. Postupom času sa iniciatívou používateľov s vyššími nárokmi pridávali nové konštrukcie na uľahčenie práce. Nástroj takto rozvíjali až do dnešnej podoby. My sa budeme opierať o špecifikáciu regulárnych výrazov v jazyku Python \cite{Python3Documentation}.
 
 Ako čoskoro zistíme, nové regulárne výrazy vedia reprezentovať zložitejšie jazyky ako regulárne, preto je dobré ich nejako odlíšiť. V literatúre sa zaužíval výraz ,,regex'' z anglického \textit{regular expression}, ktorý budeme používať aj my.
 
@@ -89,7 +92,9 @@ ak za operáciou: namiesto greedy implementácie použi minimalistickú, t.j. zo
 \item (?\# komentár) -- komentár sa pri vykonávaní regexu úplne ignoruje
 \end{itemize}
 
-Všetky tieto konštrukcie sú len ,,kozmetickou'' úpravou pôvodných regexov -- to isté vieme popísať pôvodnými regulárnymi výrazmi, akurát je to dlhšie a menej prehľadné.
+Všetky tieto konštrukcie sú len ,,kozmetickou'' úpravou pôvodných regexov -- to isté vieme popísať pôvodnými regulárnymi výrazmi, akurát je to dlhšie a menej prehľadné
+
+Rozdiely medzi minimalistickou a greedy verziou operácií vníma iba používateľ, pretože ak existuje zhoda regexu so slovom, v oboch prípadoch sa nájde. Viditeľné sú až pri výstupnej informácii pre používateľa, ktorú môže použiť ďalej.
 
 \subsection{Zložitejšie konštrukcie}
 \subsubsection*{Spätné referencie}
@@ -110,7 +115,7 @@ Zapísaný formou $\lookbehind \dots)$, vnútri je validný regex.
 Pri výpočte zoberieme regex vnútri lookbehindu a snažíme sa vyhovieť ľubovoľnému sufixu už matchovanej časti slova. Ak vyhovieme, pokračujeme v slove a regexe akoby tam lookbehind vôbec nebol.
 
 Aj lookbehind má negatívnu verziu -- negatívny lookbehind $\nlookbehind \dots)$ -- a pracuje analogicky ako negatívny lookahead.
-\\ \\ Lookahead a lookbehind sú v rôznych implementáciách rôzne obmedzované, aby výpočet netrval príliš dlho. V teórii tieto obmedzenia ignorujeme a prezentujeme model v plnej sile -- výsledky tak prezentujú hornú hranicu toho, čo implemetnácie dokážu. 
+\\ \\ Lookahead a lookbehind (spolu nazývané jedným slovom lookaround) sú v rôznych implementáciách rôzne obmedzované, aby výpočet netrval príliš dlho. V teórii tieto obmedzenia ignorujeme a prezentujeme model v plnej sile -- výsledky tak prezentujú hornú hranicu toho, čo implemetnácie dokážu. 
 
 \subsection{Triedy a množiny}
 Kvôli porovnávaniu a vytvoreniu hierarchie sme rozdelili operácie do niekoľkých množín:
@@ -124,11 +129,73 @@ Kvôli porovnávaniu a vytvoreniu hierarchie sme rozdelili operácie do niekoľk
 \item[$\lel$] -- trieda jazykov nad $\le$
 \item[$\nlel$] -- trieda jazykov nad $\nle$
 \end{description}
+
+Trieda $\lel$ už bola hlbšie preskúmaná a výsledky čerpáme z článkov \cite{ExtendedRegexPower} a \cite{ExtendedRegexIntersec}.
  
-\section{Význam lookaroundu}
-Tu rozoberiem, že samotný nespraví nič, ale so spätnými referenciami je silný.
+\section{Vlastnosti lookaroundu}
+Na začiatok sme zisťovali, čo robia samotné operácie lookaroundu.
+\begin{theorem}
+$\R$ je uzavretá na negatívny a pozitívny lookaround.
+\end{theorem}
+\begin{proof}
+Nech $L_1,L_2,L_3\in\R$. Chceme ukázať, že $L_1\lookahead L_2)L_3, L_1\lookbehind L_2)L_3, L_1\nlookahead L_2)L_3, L_1\nlookbehind L_2,L_3 \in \R$. Pre každé $L_i$, $i \in \lbrace 1,2,3\rbrace$ existuje determinický konečný automat $A_i$, ktorý ho akceptuje. Spojíme automaty dohromady nasledujúcim spôsobom:
+
+$L_1\lookahead L_2)L_3$: Začne výpočet $A_1$. Ak akceptuje, spustí sa naraz výpočet $A_2$ a $A_3$ ...
+\end{proof}
+
+\begin{theorem}
+$\L_{CF}$ nie je uzavretá na pozitívny lookaround.
+\end{theorem}
+Vieme totiž vygenerovať jazyk $a^nb^nc^n$ prienikom jazykov $a*b^nc^n$ a $a^nb^nc*$.
+
+\begin{theorem}
+$\L_{CS}$ je uzavretá na pozitívny lookaround.
+\end{theorem}
+
+\begin{theorem}
+Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
+\end{theorem}
+
 \section{Chomského hierarchia}
+\begin{theorem}
+$\R \subsetneq \el \subseteq \lel \subsetneq \nlel \subsetneq \L_{CS}$
+\end{theorem}
+Všetky $\subseteq$ triviálne platia.
+
+$\el \subsetneq \lel$: Nerovnosť dokazuje jazyk $L=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ pre nejaké } k'>0,i>0\rbrace$. $L\notin\e$ podľa pumpovacej lemy z \cite{ExtendedRegexIntersec} a tu je regex z $\le$ pre L: 
+$\alpha=\displaystyle{\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b \lookahead (\backslash 1) *\$ ) (\backslash 2)* }$
+
+$\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace$.
+\\ \\
+Intuitívne by malo platiť aj $\el \subsetneq \lel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$.
+
 \section{Vlastnosti triedy $\lel$}
+
+Očividne operácia lookahead/lookbehind pridala uzavretosť na prienik. Nech $\alpha,\beta\in\le$, potom $L(\alpha)\cap L(\beta) = L(\gamma)$, kde $\gamma = \lookahead \alpha \$)\beta$ alebo $\beta \lookbehind ~\textasciicircum \alpha)$.
+
+\begin{theorem}
+Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neobsahuje lookahead s $\mathdollar$ ani lookbehind s $\textasciicircum$ vnútri iterácie. Existuje konštanta $N$ taká, že ak $w \in L(\alpha)$ a $\vert w \vert > N$, potom existuje dekompozícia $w=xy$ s nasledujúcimi vlastnosťami:
+\begin{enumerate}[(i)]
+\item $\vert y \vert \geq 1$
+\item $\exists k \in \N,~k\neq 0;~\forall j = 1,2,\ldots: xy^{kj} \in L(\alpha)$
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
+\end{theorem}
+Takýto jazyk pre konkrétny Turingov stroj obsahuje slová, ktoré sú tvorené postupnosťou konfigurácií oddelených oddeľovačom \#, ktoré zodpovedajú akceptačným výpočtom na všetkých možných vstupoch.
+
+Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vytvoriť. Konštrukcia regexu: $\alpha = \beta(\gamma)*\eta$, kde $\beta$ predstavuje počiatočnú konfiguráciu\footnote{Musí byť previazaná s nasledujúcou konfiguráciou, aby spĺňala $\delta$-funkciu. Spraví sa to podobne ako v $\gamma_1$.} a $\eta$ akceptačnú konfiguráciu. Ak $q_0$ je akceptačný stav, potom na koniec $\alpha$ pridáme $|(\#q_0.*\#)$. $\gamma = \gamma_1~|~\gamma_2~|~\gamma_3$.	Prvok $\gamma_i$ generuje validnú konfiguráciu a zároveň kontroluje, či nasledujúca konfigurácia môže podľa $\delta$-funkcie nasledovať. Rozpíšeme si iba jednu možnosť: 
+ $ \displaystyle \gamma_1=(\mathop(_k.*\mathop)_k x q y \mathop(_{k+1} .* \mathop)_{k+1} \#)(?= \xi \#)$ platí pre $\forall q \in K,~\forall y \in \Sigma$ a kde $ \xi = \xi_1 ~|~ \xi_2 ~|~ \dots ~|~ \xi_n $.
+\begin{itemize}
+\item Ak $ (p,z,0) \in \delta(q,y)$, potom $\xi_i = (\backslash k~x p z \backslash k+1)$ pre nejaké $i$
+\item Ak $ (p,z,1) \in \delta(q,y)$, potom $\xi_i = (\backslash k~x z p \backslash k+1)$ pre nejaké $i$
+\item Ak $ (p,z,-1) \in \delta(q,y)$, potom $\xi_i = (\backslash k~p x z \backslash k+1)$ pre nejaké $i$
+\end{itemize}
+
+$\gamma_2$ a $\gamma_3$ sú podobné ako $\gamma_1$, ale matchujú krajné prípady, kedy je hlava Turingovho stroja na ľavom alebo pravom konci pásky.
+
 \section{Priestorová zložitosť}
 \section*{Poďakovanie}
 Ďakujem školiteľovi za cenné rady a pripomienky.
