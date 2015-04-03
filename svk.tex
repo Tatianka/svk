@@ -160,18 +160,46 @@ Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentn
 \begin{theorem}
 $\R \subsetneq \el \subseteq \lel \subsetneq \nlel \subsetneq \L_{CS}$
 \end{theorem}
+\begin{proof}
+
 Všetky $\subseteq$ triviálne platia.
 
 $\el \subsetneq \lel$: Nerovnosť dokazuje jazyk $L=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ pre nejaké } k'>0,i>0\rbrace$. $L\notin\e$ podľa pumpovacej lemy z \cite{ExtendedRegexIntersec} a tu je regex z $\le$ pre L: 
 $\alpha=\displaystyle{\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b \lookahead (\backslash 1) *\$ ) (\backslash 2)* }$
 
 $\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace$.
-\\ \\
+\end{proof}
+
 Intuitívne by malo platiť aj $\el \subsetneq \lel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$.
 
 \section{Vlastnosti triedy $\lel$}
 
 Očividne operácia lookahead/lookbehind pridala uzavretosť na prienik. Nech $\alpha,\beta\in\le$, potom $L(\alpha)\cap L(\beta) = L(\gamma)$, kde $\gamma = \lookahead \alpha \$)\beta$ alebo $\beta \lookbehind ~\textasciicircum \alpha)$.
+
+Napak ohrozila uzavretosť na základnú operáciu -- zreťazenie. Pri zreťazení 2 jazykov, ktorých regexy nutne musia obsahovať lookahead resp. lookbehind nastáva problém. Nemôžeme tieto regexy len tak položiť za seba. Ak sa napríklad v prvom z jazykov nachádza lookahead, počas výpočtu môže zasahovať aj do časti vstupu, ktorú matchuje druhý regex a tým zmeniť výsledok celého výpočtu. Nakoniec sa ukázalo:
+\begin{theorem}
+$\lel$ je uzavretá na zreťazenie.
+\end{theorem}
+\begin{proof}
+Nech $\alpha,\beta\in\le$. Jazyku $L(\alpha)L(\beta)$ bude zodpovedať regex
+$$
+\gamma = \lookahead \mathop(_1 \alpha \mathop)_1 \mathop(_{k+2}\beta \mathop)_{k+2} \mathdollar) ~\alpha ' \backslash k\text{+2}~ \lookbehind ~\textasciicircum\backslash 1~\beta ')
+$$
+V $\alpha,\beta$ treba vhodne prepísať označenie zátvoriek (po poradí). $\alpha '$ je $\alpha$ prepísaný tak, že pre každý lookahead:
+\begin{itemize}
+\item bez \$ -- na koniec pridáme $.* \backslash k+2 \mathdollar $
+\item s \$ -- pred \$ pridáme $\backslash k+2$
+\end{itemize}
+$\beta '$ je $\beta$ prepísaný tak, že pre každý lookbehind:
+\begin{itemize}
+\item bez $\textasciicircum$ -- na začiatok pridáme $\textasciicircum \backslash 1.*$
+\item s $\textasciicircum$ -- pred $\textasciicircum$ pridáme $\textasciicircum \backslash 1$
+\end{itemize}
+
+Slovami vyjadrené, regex $\gamma$ najprv rozdelí vstupné slovo na 2 podslová $w_1,w_2$ patriace do príslušných jazykov $L(\alpha), L(\beta)$. Potom spustí ešte raz regex $\alpha$ upravený tak, že jeho lookaheady sú ,,skrotené'', pretože ich na konci donúti matchovať $w_2$. Rovnako lookbehindy v $\beta'$ donúti na začiatku matchovať $w_1$, až potom normálne pokračuje ich výpočet.
+
+Zrejme $L(\gamma)=L(\alpha)L(\beta)$.
+\end{proof}
 
 \begin{theorem}
 Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neobsahuje lookahead s $\mathdollar$ ani lookbehind s $\textasciicircum$ vnútri iterácie. Existuje konštanta $N$ taká, že ak $w \in L(\alpha)$ a $\vert w \vert > N$, potom existuje dekompozícia $w=xy$ s nasledujúcimi vlastnosťami:
@@ -184,10 +212,11 @@ Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neob
 \begin{theorem}
 Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
 \end{theorem}
+\begin{proof}
 Takýto jazyk pre konkrétny Turingov stroj obsahuje slová, ktoré sú tvorené postupnosťou konfigurácií oddelených oddeľovačom \#, ktoré zodpovedajú akceptačným výpočtom na všetkých možných vstupoch.
 
-Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vytvoriť. Konštrukcia regexu: $\alpha = \beta(\gamma)*\eta$, kde $\beta$ predstavuje počiatočnú konfiguráciu\footnote{Musí byť previazaná s nasledujúcou konfiguráciou, aby spĺňala $\delta$-funkciu. Spraví sa to podobne ako v $\gamma_1$.} a $\eta$ akceptačnú konfiguráciu. Ak $q_0$ je akceptačný stav, potom na koniec $\alpha$ pridáme $|(\#q_0.*\#)$. $\gamma = \gamma_1~|~\gamma_2~|~\gamma_3$.	Prvok $\gamma_i$ generuje validnú konfiguráciu a zároveň kontroluje, či nasledujúca konfigurácia môže podľa $\delta$-funkcie nasledovať. Rozpíšeme si iba jednu možnosť: 
- $ \displaystyle \gamma_1=(\mathop(_k.*\mathop)_k x q y \mathop(_{k+1} .* \mathop)_{k+1} \#)(?= \xi \#)$ platí pre $\forall q \in K,~\forall y \in \Sigma$ a kde $ \xi = \xi_1 ~|~ \xi_2 ~|~ \dots ~|~ \xi_n $.
+Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vytvoriť. Konštrukcia regexu: $\alpha = \beta(\gamma)*\eta$, kde $\beta$ predstavuje počiatočnú konfiguráciu\footnote{Musí byť previazaná s nasledujúcou konfiguráciou, aby spĺňala $\delta$-funkciu. Spraví sa to podobne ako v $\gamma_1$.} a $\eta$ akceptačnú konfiguráciu. Ak $q_0$ je akceptačný stav, potom na koniec $\alpha$ pridáme $|(\#q_0.*\#)$. $\gamma = \gamma_1~|~\gamma_2~|~\gamma_3$.	Prvok $\gamma_i$ generuje validnú konfiguráciu a zároveň kontroluje pomocou lookaheadu, či nasledujúca konfigurácia môže podľa $\delta$-funkcie nasledovať. Rozpíšeme si iba jednu možnosť: 
+ $$ \displaystyle \gamma_1=(\mathop(_k.*\mathop)_k x q y \mathop(_{k+1} .* \mathop)_{k+1} \#)(?= \xi \#)$$ platí pre $\forall q \in K,~\forall y \in \Sigma$ a kde $ \xi = \xi_1 ~|~ \xi_2 ~|~ \dots ~|~ \xi_n $.
 \begin{itemize}
 \item Ak $ (p,z,0) \in \delta(q,y)$, potom $\xi_i = (\backslash k~x p z \backslash k+1)$ pre nejaké $i$
 \item Ak $ (p,z,1) \in \delta(q,y)$, potom $\xi_i = (\backslash k~x z p \backslash k+1)$ pre nejaké $i$
@@ -195,6 +224,8 @@ Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vy
 \end{itemize}
 
 $\gamma_2$ a $\gamma_3$ sú podobné ako $\gamma_1$, ale matchujú krajné prípady, kedy je hlava Turingovho stroja na ľavom alebo pravom konci pásky.
+
+\end{proof}
 
 \section{Priestorová zložitosť}
 \section*{Poďakovanie}
@@ -205,11 +236,5 @@ $\gamma_2$ a $\gamma_3$ sú podobné ako $\gamma_1$, ale matchujú krajné príp
 \bibliographystyle{apalike}
 \bibliography{references}
 
-%% citacie ulozte do suboru references.bib
-%% na populaciu zoznamu literatury pouzite program
-%%
-%% bibtex references
-%%
-%% po ktorom je potrebne dokument znova zlatexovat
 \end{document}
 
