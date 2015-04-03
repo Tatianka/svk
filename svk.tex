@@ -1,0 +1,148 @@
+% !Mode:: "TeX::UTF-8"
+\documentclass{svk_long_sk}
+%% ak pisete po anglicky, pouzijete namiesto horneho riadku
+%% \documentclass{svk_long_en}
+\usepackage{mathrsfs}
+\usepackage{amstext}
+
+%definície pre foju
+%\newtheorem{veta}{Veta}[section] 
+%\newtheorem{df}[veta]{Definícia}
+%\newtheorem{lema}[veta]{Lema}
+%\newtheorem{dosledok}[veta]{Dôsledok}
+\def\R{{\cal R}} % znak pre regulárne jazyky
+\def\L{\mathscr{L}} % zvyšné triedy jazykov
+\def\P{{\cal P}} % potenčná množina
+\def\N{\mathds{N}} %prirodzene cisla
+\def\re{Regex}
+\def\e{Eregex}
+\def\le{LEregex}
+\def\nle{nLEregex}
+\def\rel{{\mathscr{L}_{RE}}}
+\def\el{\mathscr{L}_{ERE}}
+\def\lel{\mathscr{L}_{LERE}}
+\def\nlel{\mathscr{L}_{nLERE}}
+\def\lookahead{\text{(?=}}
+\def\nlookahead{\text{(?!~}}
+\def\lookbehind{\text{(?\textless =}}
+\def\nlookbehind{\text{(?\textless !~}}
+
+\begin{document}
+\title{Moderné regulárne výrazy}
+
+\author{Tatiana Tóthová
+\email{tothova166@uniba.sk}}
+%% vsimnite si, ze u autorov sa nepisu tituly
+%% prikaz \inst sluzi ako odkaz do zoznamu institucii
+%% (vid. nizsie)
+
+%% skolitela nepiste medzi autorov, ale v tejto casti
+%% ak praca nema skolitela, jednoducho vynechajte
+\supervisor{Michal Fori\v{s}ek
+\email{forisek@dcs.fmph.uniba.sk}}
+
+%% nasleduje kratka verzia nazvu clanku a 
+%% zoznam autorov (bez krstnych mien)
+%% tieto informacie sa zobrazuju v hlavicke
+\titlerunning{Moderné regulárne výrazy}
+\authorrunning{Tóthová}
+
+\institute{
+Katedra informatiky,
+FMFI UK,
+Mlynská Dolina
+842~48~Bratislava}
+
+\maketitle
+
+\begin{abstract}
+Regulárne výrazy implementované v súčasných programovacích jazykoch ponúkajú omnoho viac operácií ako pôvodný model z teórie jazykov. Už konštrukciou spätných referencií bola prekročená hranica regulárnych jazykov. Náš model obsahuje naviac konštrukcie lookahead a lookbehind. V článku uvedieme zaradenie modelu zodpovedajúcej triedy jazykov do Chomského hierarchie, vlasnosti tejto triedy a výsledky z oblasti priestorovej zložitosti.
+
+\keywords{regulárny výraz, regex, lookahead, lookbehind, spätné referencie}
+\end{abstract}
+
+\section{Úvod}
+Regulárne výrazy vznikli v 60tych rokoch v teórii jazykov ako ďalší model na vyjadrenie regulárnych jazykov. Z takéhoto popisu ľudský mozog rýchlejšie pochopil o aký jazyk sa jedná, než zo zápisu konečného automatu, či regulárnej gramatiky. Ďalšou výhodou bol kratší a kompaktný zápis.
+
+Vďaka týmto vlastnostiam boli implementované ako vyhľadávací nástroj. Postupom času sa iniciatívou používateľov s vyššími nárokmi pridávali nové konštrukcie na uľahčenie práce. Nástroj takto rozvíjali až do dnešnej podoby. My sa budeme opierať o špecifikáciu regulárnych výrazov v jazyku Python\ref{Python3Documentation}.
+
+Ako čoskoro zistíme, nové regulárne výrazy vedia reprezentovať zložitejšie jazyky ako regulárne, preto je dobré ich nejako odlíšiť. V literatúre sa zaužíval výraz ,,regex'' z anglického \textit{regular expression}, ktorý budeme používať aj my.
+
+\subsection{Základná definícia}
+
+Regulárne výrazy sú zložené zo znakov a metaznakov. Znak $a$ predstavuje jazyk $L(a)=\lbrace a \rbrace$. Metaznak alebo skupina metaznakov určuje, aká operácia sa so znakmi udeje. Základné operácie sú zreťazenie (je definované tým, že regulárne výrazy idú po sebe, bez metaznaku), Kleeneho uzáver ($(0-\infty)$-krát zopakuj výraz, metaznak $*$) a alternácia (vyber výraz naľavo alebo napravo, metaznak~$|$~). Naviac sa využíva metaznak $\backslash$, ktorý robí z metaznakov obyčajné znaky a okrúhle zátvorky na logické oddelenie regulárnych výrazov.
+
+Pre regulárny výraz $\alpha$ a slovo $w\in L(\alpha)$ hovoríme, že $\alpha$ vyhovuje slovu $w$ resp. $\alpha$ matchuje slovo $w$. Tiež budeme hovoriť, že $\alpha$ generuje jazyk $L(\alpha)$.
+
+
+\subsection{Nové jednoduché konštrukcie}
+\begin{itemize}
+\item $+$ -- Kleeneho uzáver opakujúci $(1-\infty)$-krát
+\item $\lbrace n,m \rbrace$ ($\lbrace n \rbrace$) -- opakuj regulárny výraz aspoň $n$ a najviac $m$-krát (opakuj $n$-krát)
+\item $[a_1a_2\dots a_n]$ -- predstavuje ľubovoľný znak z množiny $\lbrace a_1,\dots,a_n \rbrace$
+\item $[\textasciicircum a_1a_2\dots a_n]$ -- predstavuje ľubovoľný znak, ktorý nepatrí do množiny $\lbrace a_1,\dots,a_n \rbrace$
+\item . -- predstavuje ľubovoľný znak
+\item ? -- ak samostatne: opakuj 0 alebo 1-krát \\
+ak za operáciou: namiesto greedy implementácie použi minimalistickú, t.j. zober čo najmenej znakov (platí pre $*,+,?,\lbrace n,m \rbrace$)\footnote{všetky spomenuté operácie sú implementované greedy algoritmom}
+\item $\textasciicircum$ -- metaznak označujúci začiatok slova
+\item \$ -- metaznak označujúci koniec slova
+\item (?\# komentár) -- komentár sa pri vykonávaní regexu úplne ignoruje
+\end{itemize}
+
+Všetky tieto konštrukcie sú len ,,kozmetickou'' úpravou pôvodných regexov -- to isté vieme popísať pôvodnými regulárnymi výrazmi, akurát je to dlhšie a menej prehľadné.
+
+\subsection{Zložitejšie konštrukcie}
+\subsubsection*{Spätné referencie}
+Najprv potrebujeme očíslovať všetky zátvorky v regexe. Číslujú sa všetky, ktoré nie sú tvaru $(?\dots)$. Poradie je určnené podľa otváracej zátvorky.
+
+Spätné referencie umožňujú odkazovať sa na konkrétne zátvorky. Zápis je $\backslash k$ a môže sa nachádzať až za $k$-tymi zátvorkami. Skutočná hodnota $\backslash k$ sa určí až počas výpočtu -- predstavuje posledné podslovo zo vstupu, ktoré matchovali $k$-te zátvorky.
+
+\subsubsection*{Lookahead}
+Zapísaný formou $\lookahead \dots)$, vnútri je validný regex.
+
+Keď v regexe prídeme na pozíciu lookaheadu, zoberieme regex vo vnútri. V slove sa snažíme matchovať ľubovoľný prefix zostávajúcej časti slova. Ak sa to podarí, pokračujeme v regexe ďalej a v slove od pozície, kde lookahead začínal (tzn. akokeby v regexe nikdy nebol).
+
+Má aj negatívnu verziu -- negatívny lookahead $\nlookahead \dots)$. Vykonáva sa rovnako ako lookahead, ale má otočnú akceptáciu. Teda ak neexistuje prefix, ktorý by vedel matchovať, akceptuje.
+
+\subsubsection*{Lookbehind}
+Zapísaný formou $\lookbehind \dots)$, vnútri je validný regex.
+
+Pri výpočte zoberieme regex vnútri lookbehindu a snažíme sa vyhovieť ľubovoľnému sufixu už matchovanej časti slova. Ak vyhovieme, pokračujeme v slove a regexe akoby tam lookbehind vôbec nebol.
+
+Aj lookbehind má negatívnu verziu -- negatívny lookbehind $\nlookbehind \dots)$ -- a pracuje analogicky ako negatívny lookahead.
+\\ \\ Lookahead a lookbehind sú v rôznych implementáciách rôzne obmedzované, aby výpočet netrval príliš dlho. V teórii tieto obmedzenia ignorujeme a prezentujeme model v plnej sile -- výsledky tak prezentujú hornú hranicu toho, čo implemetnácie dokážu. 
+
+\subsection{Triedy a množiny}
+Kvôli porovnávaniu a vytvoreniu hierarchie sme rozdelili operácie do niekoľkých množín:
+\begin{description}
+\item[$\re$] -- množina operácií, pomocou ktorých vieme popísať iba regulárne jazyky; presnejšie všetky znaky a metaznaky (bez zložitejších operácií)
+\item[$\e$] -- $\re$ so spätnými referenciami
+\item[$\le$] -- $\e$ s pozitívnym lookaroundom
+\item[$\nle$] -- $\le$ s negatívnym lookaroundom
+\item[$\rel$] -- trieda jazykov nad $\re$ ($= \R$)
+\item[$\el$] -- trieda jazykov nad $\e$
+\item[$\lel$] -- trieda jazykov nad $\le$
+\item[$\nlel$] -- trieda jazykov nad $\nle$
+\end{description}
+ 
+\section{Význam lookaroundu}
+Tu rozoberiem, že samotný nespraví nič, ale so spätnými referenciami je silný.
+\section{Chomského hierarchia}
+\section{Vlastnosti triedy $\lel$}
+\section{Priestorová zložitosť}
+\section*{Poďakovanie}
+Ďakujem školiteľovi za cenné rady a pripomienky.
+
+
+\nocite{*}
+\bibliographystyle{apalike}
+\bibliography{references}
+
+%% citacie ulozte do suboru references.bib
+%% na populaciu zoznamu literatury pouzite program
+%%
+%% bibtex references
+%%
+%% po ktorom je potrebne dokument znova zlatexovat
+\end{document}
+
