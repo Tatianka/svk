@@ -119,7 +119,7 @@ Aj lookbehind má negatívnu verziu -- negatívny lookbehind $\nlookbehind \dots
 
 \subsection{Priorita}
 
-Pri interakcii toľkých operácií je nutné vedieť ich priority. Najprv sú také, ktoré sa správajú ako znak, čomu zodpovedajú [],[\textasciicircum],. a každá spätná referencia. Špeciálne sú lookahead a lookbehind -- tie sa vykonajú hneď akonáhle na ne narazíme. Ostatné zoradíme v tabuľke: 
+Pri interakcii toľkých operácií je nutné vedieť ich priority. Existujú také, ktoré sa správajú ako znak, čomu zodpovedajú [],[\textasciicircum],. a každá spätná referencia. Špeciálne sú lookahead a lookbehind -- tie sa vykonajú hneď akonáhle na ne narazíme. Ostatné zoradíme v tabuľke: 
 
 \begin{center}
 \begin{tabular}{|c||c|c|c|c|}
@@ -146,17 +146,28 @@ Kvôli porovnávaniu a vytvoreniu hierarchie sme rozdelili operácie do niekoľk
 Trieda $\lel$ už bola hlbšie preskúmaná a výsledky čerpáme z článkov \cite{ExtendedRegexPower} a \cite{ExtendedRegexIntersec}.
  
 \section{Formalizácia modelu}
-Pri zložitejších dôkazoch sa ukázala potreba lepšieho formalizmu, než len množiny operácií. Kvôli jednoduchosti sme vybrali len potrebné operácie -- zreťazenie, alternácia, Kleeneho $*$, spätné referencie a pozitívny a negatívny lookaround -- a skúsili ho vyjadriť ako model, ktorý pracuje v krokoch podobne ako Turingov stroj.
+Pri zložitejších dôkazoch sa ukázala potreba lepšieho formalizmu, než len množiny operácií. Kvôli jednoduchosti sme vybrali len potrebné operácie -- zreťazenie, alternáciu, Kleeneho $*$, spätné referencie a pozitívny a negatívny lookaround -- a pokúsili sa ho vyjadriť ako model, ktorý pracuje v krokoch podobne ako Turingov stroj.
 
-Základným prvkom je \textbf{konfigurácia}. Je to dvojica regex $r_1 \dots r_n$ a vstupné slovo $w_1 \dots w_m$, pričom v oboch reťazcoch sa navyše nachádza ukazovateľ pozície $\lceil$ (ako hlava Turingovho stroja): $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$. Špeciálne máme počiatočnú konfiguráciu $(\lceil r_1 \dots r_n,\lceil w_1 \dots w_m)$ a akceptačnú konfiguráciu $(r_1 \dots r_n \lceil, w_1 \dots w_m \lceil)$.
+Základným prvkom je \textbf{konfigurácia}. Je to dvojica regex $r_1 \dots r_n$ a vstupné slovo $w_1 \dots w_m$, pričom v oboch reťazcoch sa navyše nachádza ukazovateľ pozície $\lceil$ (ako hlava Turingovho stroja): $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$. Špeciálne rozoznávame počiatočnú konfiguráciu $(\lceil r_1 \dots r_n,\lceil w_1 \dots w_m)$ a akceptačnú konfiguráciu $(r_1 \dots r_n \lceil, w_1 \dots w_m \lceil)$.
 
-Najprv si definujeme potrebné pojmy indexovateľnosť a alternovateľnosť. \textit{Indexovateľné zátvorky} sú také, kde za otváracou zátvorkou nenasleduje ? (t.j. všetky prípady okrem lookaroundu). Tieto zátvorky budeme číslovať. \textit{Alternovateľný regex} je taký, ktorý sa môže vyskytovať v alternácii. Sú 3 prípady: regex môže byť vľavo od |, vpravo od | alebo je z oboch strán ohraničený |. Ak alternácia nie je uzavretá zátvorkami, ľavý a krajný regex siahajú až ku koncom slova, pretože alternácia je operácia s najmenšou prioritou. Inak končia pri uzatváracích zátvorkách.
+Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \textit{Indexovateľné zátvorky} sú také, kde za otváracou zátvorkou nenasleduje ? (t.j. všetky prípady okrem lookaroundu). Tieto zátvorky budeme číslovať. \textit{Alternovateľný regex} je taký, ktorý sa môže vyskytovať v alternácii. Sú 3 prípady: regex sa môže nachádzať naľavo od $|$, napravo od $|$ alebo je z oboch strán ohraničený $|$. Ak alternácia nie je uzavretá zátvorkami, ľavý a pravý krajný regex siaha až ku kraju slova, pretože alternácia je operácia s najmenšou prioritou. Inak sú pre nich hranicou zátvorky uzatváracie alternáciu.
 
-Konfigurácia, indexovateľné zátvorky, alternovateľnosť, akceptačný výpočet, jazyk, ...
+Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
 
+Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách ...
+
+\textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
+\\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
 \begin{theorem}
-Nech $\alpha \in \lel$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
+Nech $\alpha \in \lel$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $O(|\alpha|\cdot|w|)$ konfigurácií.
 \end{theorem}
+\begin{proof}
+Vo väčšine krokov výpočtu sa posúvame dopredu buď v regexe alebo v slove alebo v oboch. Takéto kroky vedú k postupnosti dĺžky $O(|\alpha|+|w|)$.
+
+Výpočet môže predĺžiť skákanie ukazovateľa dozadu. To nastáva iba v prípade, ak v regexe ukazujeme na Kleeneho $*$ a rozhodneme sa skočiť v regexe dozadu, aby sme urobili ďalšiu iteráciu. Zamyslime sa nad samotným akceptačným výpočtom. Ak existuje, potom existuje aj taká jeho verzia, kde každé opakovanie regexu pomocou Kleeneho $*$ matchuje aspoň 1 znak -- prázdne iterácie môžeme vyhodiť, lebo ukazovateľ v slove zostal na mieste a konfigurácia skoku je rovnaká, takže sa postupnosť priamo napojí. Vieme, že regex opakovaný operáciou $*$ je dlhý $O(|\alpha|)$ znakov a opakujeme najviac $O(|w|)$-krát.
+
+Teda dokopy spravíme najviac $O(|\alpha|+|w|) + O(|\alpha|\cdot|w|) = O(|\alpha|\cdot|w|)$ krokov.
+\end{proof}
  
 \section{Vlastnosti lookaroundu}
 Na začiatok sme zisťovali, čo robia samotné operácie lookaroundu.
@@ -184,7 +195,7 @@ Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentn
 
 \section{Chomského hierarchia}
 \begin{theorem}
-$\R \subsetneq \el \subseteq \lel \subsetneq \nlel \subsetneq \L_{CS}$
+$\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
 \end{theorem}
 \begin{proof}
 
@@ -193,10 +204,10 @@ Všetky $\subseteq$ triviálne platia.
 $\el \subsetneq \lel$: Nerovnosť dokazuje jazyk $L=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ pre nejaké } k'>0,i>0\rbrace$. $L\notin\e$ podľa pumpovacej lemy z \cite{ExtendedRegexIntersec} a tu je regex z $\le$ pre L: 
 $\alpha=\displaystyle{\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b \lookahead (\backslash 1) *\$ ) (\backslash 2)* }$
 
-$\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace$.
+$\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace \notin \L_{CF}$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace \in \L_{CF}$.
 \end{proof}
 
-Intuitívne by malo platiť aj $\el \subsetneq \lel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$.
+Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$.
 
 \section{Vlastnosti triedy $\lel$}
 
@@ -239,9 +250,9 @@ Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neob
 Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
 \end{theorem}
 \begin{proof}
-Takýto jazyk pre konkrétny Turingov stroj obsahuje slová, ktoré sú tvorené postupnosťou konfigurácií oddelených oddeľovačom \#, ktoré zodpovedajú akceptačným výpočtom na všetkých možných vstupoch.
+Takýto jazyk pre konkrétny Turingov stroj $M$ obsahuje slová, ktoré sú tvorené postupnosťou konfigurácií oddelených oddeľovačom \#. Každá postupnosť zodpovedá akceptačnému výpočtu na nejakom slove. Jazyk obsahuje akceptačné výpočty na všetkých slovách, ktoré sú v jazyku $L(M)$.
 
-Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vytvoriť. Konštrukcia regexu: $\alpha = \beta(\gamma)*\eta$, kde $\beta$ predstavuje počiatočnú konfiguráciu\footnote{Musí byť previazaná s nasledujúcou konfiguráciou, aby spĺňala $\delta$-funkciu. Spraví sa to podobne ako v $\gamma_1$.} a $\eta$ akceptačnú konfiguráciu. Ak $q_0$ je akceptačný stav, potom na koniec $\alpha$ pridáme $|(\#q_0.*\#)$. $\gamma = \gamma_1~|~\gamma_2~|~\gamma_3$.	Prvok $\gamma_i$ generuje validnú konfiguráciu a zároveň kontroluje pomocou lookaheadu, či nasledujúca konfigurácia môže podľa $\delta$-funkcie nasledovať. Rozpíšeme si iba jednu možnosť: 
+Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vytvoriť. Konštrukcia regexu: $\alpha = \beta(\gamma)*\eta$, kde $\beta$ predstavuje počiatočnú konfiguráciu\footnote{Musí byť previazaná s nasledujúcou konfiguráciou, aby spĺňala $\delta$-funkciu. Spraví sa to pomocou lookaheadu, podobne ako v $\gamma_1$.} a $\eta$ akceptačnú konfiguráciu. Ak $q_0$ je akceptačný stav, potom na koniec $\alpha$ pridáme $|(\#q_0.*\#)$. $\gamma = \gamma_1~|~\gamma_2~|~\gamma_3$.	Prvok $\gamma_i$ generuje validnú konfiguráciu a zároveň kontroluje pomocou lookaheadu, či nasledujúca konfigurácia môže podľa $\delta$-funkcie nasledovať. Rozpíšeme si iba jednu možnosť: 
  $$ \displaystyle \gamma_1=(\mathop(_k.*\mathop)_k x q y \mathop(_{k+1} .* \mathop)_{k+1} \#)(?= \xi \#)$$ platí pre $\forall q \in K,~\forall y \in \Sigma$ a kde $ \xi = \xi_1 ~|~ \xi_2 ~|~ \dots ~|~ \xi_n $.
 \begin{itemize}
 \item Ak $ (p,z,0) \in \delta(q,y)$, potom $\xi_i = (\backslash k~x p z \backslash k+1)$ pre nejaké $i$
@@ -251,6 +262,7 @@ Turingov stroj má konečný zápis, preto je možné regex pre takýto jazyk vy
 
 $\gamma_2$ a $\gamma_3$ sú podobné ako $\gamma_1$, ale matchujú krajné prípady, kedy je hlava Turingovho stroja na ľavom alebo pravom konci pásky.
 
+Zrejme $L(\gamma)$ je požadovaný jazyk.
 \end{proof}
 
 \section{Priestorová zložitosť}
