@@ -175,9 +175,13 @@ Na začiatok sme zisťovali, čo robia samotné operácie lookaroundu.
 $\R$ je uzavretá na negatívny a pozitívny lookaround.
 \end{theorem}
 \begin{proof}
-Nech $L_1,L_2,L_3\in\R$. Chceme ukázať, že $L_1\lookahead L_2)L_3, L_1\lookbehind L_2)L_3, L_1\nlookahead L_2)L_3, L_1\nlookbehind L_2,L_3 \in \R$. Pre každé $L_i$, $i \in \lbrace 1,2,3\rbrace$ existuje determinický konečný automat $A_i$, ktorý ho akceptuje. Spojíme automaty dohromady nasledujúcim spôsobom:
+Nech $L_1,L_2,L_3\in\R$. Chceme ukázať, že $L_1\lookahead L_2)L_3,~ L_1\lookbehind L_2)L_3,~ L_1\nlookahead L_2)L_3,~ L_1\nlookbehind L_2)L_3 \in \R$. Pre každé $L_i$, $i \in \lbrace 1,2,3\rbrace$ existuje determinický konečný automat $A_i$, ktorý ho akceptuje.
 
-$L_1\lookahead L_2)L_3$: Začne výpočet $A_1$. Ak akceptuje, spustí sa naraz výpočet $A_2$ a $A_3$ ...
+Konečné automaty vieme vhodne pospájať dohromady. Spravíme konštrukciu pre prienik regulárnych jazykov, ale mierne upravenú tak, že akonáhle automat pre $L_2$ v pozitívnom lookaheade akceptuje, vo výpočte bude pokračovať už len samotný $A_3$, kým dočíta slovo. Podobne pre pozitívny lookbehind -- $A_1$ začne sám a nedeterministicky v nejakom kroku začne výpočet aj $A_2$. Akceptovať musia spolu.
+
+Pre negatívne formy musíme navyše upraviť akceptáciu. Ak $A_2$ pre lookahead akceptuje, celý automat sa zasekne a zamietne. $A_2$ musí dočítať slovo bez dosiahnutia akceptačného stavu. Pre lookbehind v každom kroku $A_1$ spúšťame ďalší $A_2$ a držíme si množinu stavov, v ktorých sa všetky nachádzajú. Úspech je, ak $A_1$ akceptuje a množina stavov pre automaty $A_2$ neobsahuje akceptačný stav.
+
+Odhliadnuc teraz od lookaroundu, máme zreťazenie $L_1$ a $L_3$. Preto prepojíme akceptačný stav $A_1$ s počiatočným stavom $A_3$. Výsledný automat sa nedeterministicky rozhoduje, či z akceptačného stavu $A_1$ pokračuje ďalej v $A_1$ alebo $A_3$.
 \end{proof}
 
 \begin{theorem}
