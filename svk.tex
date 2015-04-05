@@ -352,15 +352,17 @@ Zrejme $L(\gamma)$ je požadovaný jazyk.
 $\lel \subseteq NSPACE(\log n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 \begin{proof}
-Nech $\alpha\in\le$. Zostrojíme nedeterministický Turingov stroj akceptujúci $L(\alpha)$, ktorý bude mať vstupnú read--only pásku a 1 jednosmerne nekonečnú pracovnú pásku, na ktorej zapíše najviac $\log n$ políčok.
+Nech $\alpha\in\le$. Zostrojíme nedeterministický Turingov stroj T akceptujúci $L(\alpha)$, ktorý bude mať vstupnú read--only pásku a 1 jednosmerne nekonečnú pracovnú pásku, na ktorej zapíše najviac $\log n$ políčok.
 
 Výpočet Turingovho stroja bude prebiehať podľa postupnosti konfigurácií formálneho modelu. Nemôžeme nič zapísať na vstupnú pásku a máme k dispozícii menej priestoru ako je dĺžka vstupu. Využijeme to, že pre vstup dĺžky $n$ vieme uložiť ľuboboľnú pozíciu na vstupe do adresy dĺžky $\log n$. Ukážeme, že takýchto adries potrebujeme konečný počet. Potom ich vieme písať nad seba do niekoľkých stôp pásky a mať tak zapísaných najviac $\log n$ políčok na páske.
 
-Celý regex $\alpha$ bude uložený v stave aj s ukazovateľom. Budú existovať stavy pre všetky možné pozície ukazovateľa a tzv. metaprechody budú medzi stavmi podľa definície kroku výpočtu na regexe. Medzi každými dvoma stavmi prepojenými metaprechodom môže byť potrebných až niekoľko prechodov cez pomocné stavy (napríklad keď narazí na otváraciu indexovateľnú zátvorku, na ktorú sa odkazujú spätné referencie, musí zapísať aktuálnu pracovnú adresu v slove ako začiatok podslova).
+Celý regex $\alpha$ bude uložený v stave aj s ukazovateľom. Budú existovať stavy pre všetky možné pozície ukazovateľa v regexe a medzi stavmi budú tzv. metaprechody podľa definície kroku výpočtu na regexe. Medzi každými dvoma stavmi prepojenými metaprechodom môže byť potrebných až niekoľko prechodov cez pomocné stavy (napríklad keď narazí na otváraciu indexovateľnú zátvorku, na ktorú sa odkazujú spätné referencie, musí zapísať aktuálnu pracovnú adresu v slove ako začiatok podslova).
 
-Adresy budú potrebné pre zaznačenie aktuálnej pozície hlavy na vstupe, aktuálnej pracovnej pozície na vstupe a zapamätanie začiatku a konca podslova zodpovedajúceho $k$-tym zátvorkám, na ktoré sa odkazujú spätné referencie ($s$), začiatku každého lookaheadu ($l_a$) a look\-be\-hindu ($l_b$). K tomu bude potrebná 1 adresa na porovnávanie podslov na vstupe pri spätných referenciách. Z definície $\alpha$ je konečnej dĺžky a pre počty daných operácií platí $s+l_a+l_b \leq |\alpha|$. Spolu máme $1+1+2s+l_a+l_b+1 \leq 2|\alpha|+3$, čo je konštanta. 
+Adresy budú zaznamenávať všetky ostatné informácie v konfigurácii -- aktuálnu pracovnú pozíciu na vstupe (ukazovateľ v slove), pomocný ukazovateľ na spätné referencie, začiatok a koniec podslova zodpovedajúceho $k$-tym zátvorkám pre $\forall k$ (počet $z$), začiatok každého lookaheadu ($l_a$) a look\-be\-hindu ($l_b$). K tomu bude potrebná 1 pomocná adresa -- aktuálna pozícia hlavy na vstupe. Z definície $\alpha$ je konečnej dĺžky a pre počty daných operácií platí $2z+l_a+l_b \leq |\alpha|$. Spolu máme $2+2z+l_a+l_b+1 \leq |\alpha|+3$, čo je konštanta. 
 
+Kroky výpočtu I., IV., V., VI., VII.(1) nepotrebujú adresy a sú algoritmycky vykonateľné. Ostatné zapisujú, prepisujú a porovnávajú adresy. Zápis aktuálnej adresy ( je len kopírovanie znakov z inej stopy), vynulovanie záznamu a porovnávanie niekoľkých stôp vyžaduje 1 prechod cez pracovnú pásku a žiadnu prídavnú pamäť.
 
+Preto T akceptuje $L(\alpha)$ a spĺňa pamäťové požiadavky.
 \end{proof}
 
 Dôsledok Savitchovej vety:
