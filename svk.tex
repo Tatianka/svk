@@ -198,13 +198,13 @@ $$(2) \vdash (r_1\dots \lceil a *\dots r_n, w_1\dots\lceil w_j\dots w_m)$$
 \footnotetext{Podľa definície spätných referencií platí podsledné podslovo nájdené regexom v $k$-tych zátvorkách. Pri tejto pracovnej pozícii v regexe je zrejmé, že nejde o prvý prechod cez tieto zátvorky a teda existuje také $a,b$, že $k$ je v slove nad $w_a$ a $k'$ nad $w_b$. Ak nastane prechod (2), pôvodné horné indexy $k, k'$ miznú a pridáva sa $k$ nad $w_j$.}
 $$(1) ~\vdash(r_1 \dots \mathop{(}_k \dots \mathop{)}_k *\lceil \dots r_n, w_1 \dots \mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j \dots w_m)$$
 $$(2) ~\vdash(r_1 \dots \mathop{(}_k\lceil \dots \mathop{)}_k * \dots r_n, w_1 \dots w_a \dots w_b \dots \lceil \mathop{w_j}^k \dots w_m)$$
-\item \underline{špeciálny ukazovateľ pre spätné referencie -- zjavenie}
+\item \underline{špeciálny ukazovateľ -- zjavenie}
 \\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\dots\mathop{w_b}^{k'}\dots \lceil w_j\dots w_m)}$
 $$\vdash(r_1 \dots \lceil \backslash k \dots r_n,w_1\ldots\intercal\mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)$$	
 \item \underline{porovnávanie spätnej referencie}
 \\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\ldots \intercal w_c \dots \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)}$, kde $a\leq c < b$ a zároveň $w_c = w_j$\footnote{$w_c$ a $w_j$ môžu byť poschodové symboly, avšak pri tejto rovnosti poschodia ignorujeme -- chceme porovnať iba písmenká v slove, prislúchajúce týmto pozíciám.}
 $$\vdash(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\dots w_c\intercal \dots \mathop{w_b}^{k'} \dots  w_j\lceil\dots w_m)$$
-\item \underline{špeciálny ukazovateľ pre spätné referencie -- zmiznutie}
+\item \underline{špeciálny ukazovateľ -- zmiznutie}
 \\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\ldots \intercal  \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)}$
 $$\vdash(r_1 \dots  \backslash k \lceil \dots r_n,w_1\dots\mathop{w_a}^k\dots \mathop{w_b}^{k'} \dots  w_j\lceil\dots w_m)$$
 \item \underline{lookahead -- začiatok a jeho záznam} 
@@ -430,10 +430,23 @@ bool $TESTUJ(C_1,C_2,i)$
 			return true
 	return false
 \end{lstlisting}
-Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(n\log n)$ pamäte.
+Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(r\log w)$ pamäte.
 
-Turingov stroj T
+Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z vety \ref{lema_dlzka_post_konfig}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
 
+Procedúra $TESTUJ$ je rekurzívna. Preto bude na pracovnej páske stroja T zásobník. Pre každú inštanciu procedúry bude mať uložené konfigurácie $C_1, C_2, C_3, c$ a informáciu, či sa vrátil z prvého alebo druhého volania (potrebný 1 bit informácie). Hodnotu $c$ vieme zapísať do priestoru $\log c = O(\log r + \log w)$, teda jeden záznam tak zaberie $3r\log w + \log c = O(r\log w)$ pamäte. Keďže parameter $i$ je vždy o polovicu menší, hĺbka rekurzie bude $\log c$.
+
+Z toho vyplýva, že zásobník bude potrebovať $O((\log r + \log w)\cdot r\cdot \log w) = O(n\log^2n)$ pamäte. Ešte treba overiť, že úkony na riadkoch 2--4 zvládne T vykonať tiež v rámci pamäťového limitu.
+
+Riadok 2 je porovnanie rovnosti adries -- pracovnú pozíciu porovnávania si môže značiť poschodovými symbolmi. Riadok 4 je triviálny. Riadok 3 je zložitý kvôli overeniu $C_1\vdash C_2$. K tomu potrebuje nasledovné kontroly:
+\begin{description}
+\item[ukazovateľ] -- či je správne posunutý ukazovateľ (týka sa aj špeciálneho, ak je aktívny). To znamená, že buď má byť posunutý o konkrétny počet políčok alebo má byť vľavo/vpravo a ukazovať na konkrétny symbol.
+\item[adresy] -- všetky adresy (mimo ukazovateľov) musia byť rovnaké, okrem tých, ktorým je v tomto kroku nastavená nová hodnota. Tá musí byť korektne nastavená (t.j. rovnaká ako ukazovateľ v slove). 
+\item[zátvorky] -- pre korektné skoky v regexe v krokoch II.(2) a VII.(2) musí byť medzi starou a novou pozíciou ukazovateľa počet otváracích a zatváracích zátvorkiek rovnaký.
+\item[alternovateľnosť] -- pokiaľ sa jedná o skok v alternácii (IV.,V.), treba skontrolovať prvý alebo posledný alternovateľný regex.
+\item[indexovateľnosť] -- ak zátvorka nie je indexovateľná, tak sme narazili na lookaround.
+\end{description}
+Indexovateľnosť a ukazovateľ sa skontrolujú bez použitia pomocnej pamäte. Adresy využívajú porovnávanie, ale to vieme spraviť pomocou poschodových symbolov. Alternovateľnosť využíva algoritmus na kontrolu zátvoriek -- zisťuje, či je alternácia uzavretá zátvorkami (ak hej, ktorými) alebo nie. Počet zátvoriek je najviac $\frac{r}{2}$. Používame algoritmus, kde je ( priradíme 1 a ) hodnotu -1\footnote{Ak počítame sprava doľava, obe hodnoty prenásobíme $(-1)$, aby sme pri prvej zátvorke nemali súčet $0+(-1)$.}. Pri každom výskyte sa hodnoty sčítavajú, 0 je dobre uzátvorkovaný výraz. Kontrola sa vykoná a súčet po nej už nepotrebujeme, preto ho môžeme dočasne zapísať na koniec zásobníka a vzápätí vymazať. Zapísaná pamäť tak bude $r+O(n\log^2n)=O(n\log^2n)$.
 \end{proof}
 
 \section*{Poďakovanie}
