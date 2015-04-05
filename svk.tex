@@ -348,7 +348,7 @@ Zrejme $L(\gamma)$ je požadovaný jazyk.
 \end{proof}
 
 \section{Priestorová zložitosť}
-\begin{theorem}
+\begin{theorem}\label{lere_nspace(logn)}
 $\lel \subseteq NSPACE(\log n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 \begin{proof}
@@ -360,7 +360,7 @@ Celý regex $\alpha$ bude uložený v stave aj s ukazovateľom. Budú existovať
 
 Adresy budú zaznamenávať všetky ostatné informácie v konfigurácii -- aktuálnu pracovnú pozíciu na vstupe (ukazovateľ v slove), pomocný ukazovateľ na spätné referencie, začiatok a koniec podslova zodpovedajúceho $k$-tym zátvorkám pre $\forall k$ (počet $z$), začiatok každého lookaheadu ($l_a$) a look\-be\-hindu ($l_b$). K tomu bude potrebná 1 pomocná adresa -- aktuálna pozícia hlavy na vstupe. Z definície $\alpha$ je konečnej dĺžky a pre počty daných operácií platí $2z+l_a+l_b \leq |\alpha|$. Spolu máme $2+2z+l_a+l_b+1 \leq |\alpha|+3$, čo je konštanta. 
 
-Kroky výpočtu I., IV., V., VI., VII.(1) nepotrebujú adresy a sú algoritmycky vykonateľné. Ostatné zapisujú, prepisujú a porovnávajú adresy. Zápis aktuálnej adresy ( je len kopírovanie znakov z inej stopy), vynulovanie záznamu a porovnávanie niekoľkých stôp vyžaduje 1 prechod cez pracovnú pásku a žiadnu prídavnú pamäť.
+Kroky výpočtu I., IV., V., VI., VII.(1) nepotrebujú pomocné stavy. Ostatné kroky zapisujú, prepisujú a porovnávajú adresy. Zápis aktuálnej adresy ( je len kopírovanie znakov z inej stopy), vynulovanie záznamu a porovnávanie niekoľkých stôp vyžaduje 1 prechod cez pracovnú pásku a žiadnu prídavnú pamäť.
 
 Preto T akceptuje $L(\alpha)$ a spĺňa pamäťové požiadavky.
 \end{proof}
@@ -372,13 +372,25 @@ $\lel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \begin{theorem}
 $\nlel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
+\begin{proof}
+\TODO
+\end{proof}
+
+V praxi je bežné, že užívateľ zadáva nielen vstupný text, ale aj samotný regex. Preto sme sa rozhodli analyzovať jazyk, ktorý dostane na vstup oboje -- slovo $regex\#word$-- a akceptuje slovo len vtedy, ak slovo $word$ vyhovuje regexu $regex$.
 
 \begin{theorem}
 $L(regex\#word) \in NSPACE(r \log w)$, kde $r = |regex|,~w = |word|$ a $regex \in \le$.
 \end{theorem}
+\begin{proof}
+Myšlienka dôkazu je podobná ako v dôkaze \ref{lere_nspace(logn)}. Rozdiel je v tom, že regex nepoznáme dopredu. Z čoho vyplýva, že si ho nemôžeme uchovať v stave. Preto pribudnú ďalšie 2 adresy -- pracovná pozícia v regexe (ukazovateľ) a aktuálna pozícia v regexe. Ďalším dôsledkom je, že síce počet adries ohraničíme zhora číslom $r+3$, ale už to viac nie je konštanta. Preto adresy nemôžeme ukladať na viacerých stopách pod sebou, ale musia byť vedľa seba oddelené oddeľovačmi. Pre rovnako pohodlné porovnávanie a zapisovanie si môžeme dovoliť pridať 1 pracovnú pásku, na ktorú si 1 z porovnávaných adries zapíšeme -- tá bude mať vždy najviac $\log w$ zapísaných políčok.
+
+Turingov stroj bude fungovať ako v dôkaze \ref{lere_nspace(logn)}, ale odhad zapísanej pamäte bude $(r+3)\cdot \log w + 2\log r$. Všetky pozície v slove vieme adresovať od oddeľovača \#, preto zaberú $\log w$ pamäte. Na záver pribudla pracovná a aktuálna pozícia v regexe, z nich každá potrebuje $\log r$ políčok. Dokopy Turingov stroj zapíše $O(r\log w)$ pamäte.
+\end{proof}
+
 \begin{theorem}
 $L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vstupu.
 \end{theorem}
+
 \section*{Poďakovanie}
 Ďakujem školiteľovi za cenné rady a pripomienky.
 
