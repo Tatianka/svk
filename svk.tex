@@ -8,6 +8,7 @@
 \usepackage{dsfont}
 \usepackage[shortlabels]{enumitem}
 \usepackage{color}
+\usepackage{amsmath}
 
 %definície pre foju
 %\newtheorem{veta}{Veta}[section] 
@@ -154,6 +155,8 @@ Pri zložitejších dôkazoch sa ukázala potreba lepšieho formalizmu, než len
 
 Základným prvkom je \textbf{konfigurácia}. Je to dvojica regex $r_1 \dots r_n$ a vstupné slovo $w_1 \dots w_m$, pričom v oboch reťazcoch sa navyše nachádza ukazovateľ pozície $\lceil$ (ako hlava Turingovho stroja): $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$. Špeciálne rozoznávame počiatočnú konfiguráciu $(\lceil r_1 \dots r_n,\lceil w_1 \dots w_m)$ a akceptačnú konfiguráciu $(r_1 \dots r_n \lceil, w_1 \dots w_m \lceil)$.
 
+Znaky slova ($w_1\dots w_m$) v konfigurácii budú niesť nejakú informáciu naviac, preto použijeme poschodové symboly. Na najspodnejšom poschodí bude uchovaná informácia o skutočnom znaku na tej pozícii v slove a nebude sa meniť. Obsah vrchných poschodí bude špecifikovaný v kroku výpočtu. Z celého poschodového symbolu budeme zobrazovať vždy len tú informáciu, ktorú práve potrebujeme, tzn. $w_j$ bude predstavovať iba znak na najspodnejšom poschodí. Nezabúdajme však, že na ostatných poschodiach môže mať zapísané čokoľvek, čo možno neskôr v inom kroku využijeme.
+
 Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \textit{Indexovateľné zátvorky} sú také, kde za otváracou zátvorkou nenasleduje ? (t.j. všetky prípady okrem lookaroundu). Tieto zátvorky budeme číslovať. \textit{Alternovateľný regex} je taký, ktorý sa môže vyskytovať v alternácii. Sú 3 prípady: regex sa môže nachádzať naľavo od $|$, napravo od $|$ alebo je z oboch strán ohraničený $|$. Ak alternácia nie je uzavretá zátvorkami, ľavý a pravý krajný regex siaha až ku kraju slova, pretože alternácia je operácia s najmenšou prioritou. Inak sú pre nich hranicou zátvorky uzatváracie alternáciu.
 
 Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
@@ -234,15 +237,36 @@ $$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lc
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
 \begin{theorem}
-Nech $\alpha \in \lel$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $O(|\alpha|\cdot|w|)$ konfigurácií.
+Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|^2\cdot|w|$ konfigurácií.
 \end{theorem}
 \begin{proof}
-Vo väčšine krokov výpočtu sa posúvame dopredu buď v regexe alebo v slove alebo v oboch. Takéto kroky vedú k postupnosti dĺžky $O(|\alpha|+|w|)$.
+Vo väčšine krokov výpočtu sa posúvame dopredu buď v regexe alebo v slove alebo v oboch. Takéto kroky vedú k postupnosti dĺžky najviac $|\alpha|+|w|$.
 
-Výpočet môže predĺžiť skákanie ukazovateľa dozadu. To nastáva iba v prípade, ak v regexe ukazujeme na Kleeneho $*$ a rozhodneme sa skočiť v regexe dozadu, aby sme urobili ďalšiu iteráciu. Zamyslime sa nad samotným akceptačným výpočtom. Ak existuje, potom existuje aj taká jeho verzia, kde každé opakovanie regexu pomocou Kleeneho $*$ matchuje aspoň 1 znak -- prázdne iterácie môžeme vyhodiť, lebo ukazovateľ v slove zostal na mieste a konfigurácia skoku je rovnaká, takže sa postupnosť priamo napojí. Vieme, že regex opakovaný operáciou $*$ je dlhý $O(|\alpha|)$ znakov a opakujeme najviac $O(|w|)$-krát.
+V krokoch VIII. a X. sa žiaden ukazovateľ nepohne. Oba kroky sa vyskytujú 1x ku každej spätnej referencii, ktorých je najviac $|\alpha|$, takže tieto konfigurácie sa objavia najviac $2\cdot|\alpha|$-krát.
 
-Teda dokopy spravíme najviac $O(|\alpha|+|w|) + O(|\alpha|\cdot|w|) = O(|\alpha|\cdot|w|)$ krokov.
+Výpočet môže predĺžiť skákanie ukazovateľa dozadu. V krokoch VI.(2),VII.(2) sa na Kleeneho $*$ rozhodneme urobiť ďalšiu iteráciu. Zamyslime sa nad samotným akceptačným výpočtom. Ak existuje, potom existuje aj taká jeho verzia, kde každé opakovanie regexu pomocou Kleeneho $*$ matchuje aspoň 1 znak -- prázdne iterácie môžeme vyhodiť, lebo ukazovateľ v slove zostal na mieste a konfigurácia skoku je rovnaká, takže postupnosť sa priamo naviaže. Vieme, že regex opakovaný operáciou $*$ je dlhý nanajvýš $|\alpha|$ znakov a podľa úvahy ho treba opakovať najviac $|w|$-krát.
+
+Teda dokopy spravíme najviac $|\alpha|+|w|+2\cdot|\alpha|+|\alpha|\cdot|w| \leq 5\cdot|\alpha|\cdot|w|$ krokov.
 \end{proof}
+
+\begin{theorem}\label{lema_dlzka_post_konfig}
+Nech $\alpha \in \lel,~ w \in L(\alpha),~ r = |\alpha|$ a $v = |w|$. Potom existuje akceptačný výpočet, ktorý má nanajvýš $O(r^2w^3)$ konfigurácií.
+\end{theorem}
+\begin{proof}
+Spočítajme, koľko je všetkých konfigurácií pre regex $\alpha$ a slovo $w$.
+
+Ukazovateľ v regexe môže mať $(r+1)$ rôznych pozícií. Ukazovateľ v slove môže mať $(v+1)$ rôznych pozícií. V slove môžu byť niekedy 2 ukazovatele. Spolu máme $(r+1)(w+1)+(r+1)(w+1)^2 = (r+1)(w+1)(w+2)$ možností.
+
+V konfiguráciách sú v poschodových symboloch zapísané informácie potrebné k výpočtu. Pre každé spätné referencie sú to 2 zápisy a pre každý lookaround 1. Dokopy je to najviac $2r$ zápisov. Každá informácia buď v regexe ešte nie je zapísaná alebo má $w$ možností, kde zapísaná môže byť. Pre informácie máme dokopy $2r(w+1)$ možností.
+
+Všetkých možných konfigurácií je dohromady
+\begin{equation}\label{eq_pocet_konfig}
+(r+1)(w+1)(w+2)\cdot 2r(w+1) = O(r^2w^3)
+\end{equation}
+
+Späť k akceptačnému výpočtu. Nech sú všetky akceptačné výpočty dlhšie ako \eqref{eq_pocet_konfig}. Potom tento výpočet musí nutne obsahovať 2 rovnaké konfigurácie. Keď vymažeme úsek medzi rovnakými konfiguráciami a napojíme postupnosť, dostaneme opäť validný akceptačný výpočet. Postup opakujeme, pokým výpočet obsahuje nejaké 2 rovnaké konfigurácie. Keď skončíme, sú všetky konfigurácie vo výpočte rôzne a preto má najviac \eqref{eq_pocet_konfig} konfigurácií.
+\end{proof}
+
  
 \section{Vlastnosti lookaroundu}
 Na začiatok sme zisťovali, čo robia samotné operácie lookaroundu.
@@ -390,6 +414,27 @@ Turingov stroj bude fungovať ako v dôkaze \ref{lere_nspace(logn)}, ale odhad z
 \begin{theorem}
 $L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vstupu.
 \end{theorem}
+\begin{proof} \TODO zdroj Savitchovej vety
+Nech $r=|regex|,~w=|word|$.
+
+Myšlienka je podobná dôkazu Savitchovej vety. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
+\lstset{numbers=left, tabsize=4, morekeywords={if,then,return,true,false}, columns=fullflexible}
+\begin{lstlisting}[mathescape]
+bool $TESTUJ(C_1,C_2,i)$
+	if ($C_1 == C_2$) then return true
+	if ($i>0 ~\wedge~ C_1\vdash C_2$) then return true
+	if ($i<=1$) return false
+	iteruj cez vsetky konfiguracie $C_3$
+		if $(TESTUJ(C_1, C_3,\lfloor \frac{i}{2}\rfloor)$
+				$\wedge ~TESTUJ(C_3, C_2,\lceil \frac{i}{2}\rceil))$ then
+			return true
+	return false
+\end{lstlisting}
+Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(n\log n)$ pamäte.
+
+Turingov stroj T
+
+\end{proof}
 
 \section*{Poďakovanie}
 Ďakujem školiteľovi za cenné rady a pripomienky.
