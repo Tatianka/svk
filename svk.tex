@@ -7,6 +7,7 @@
 \usepackage{amssymb}
 \usepackage{dsfont}
 \usepackage[shortlabels]{enumitem}
+\usepackage{color}
 
 %definície pre foju
 %\newtheorem{veta}{Veta}[section] 
@@ -29,6 +30,9 @@
 \def\nlookahead{\text{(?!~}}
 \def\lookbehind{\text{(?\textless =}}
 \def\nlookbehind{\text{(?\textless !~}}
+
+\def\todo{{\color{red} TODO!!!}}
+\def\TODO{{\color{red} TODO!!!}}
 
 \begin{document}
 \title{Moderné regulárne výrazy}
@@ -154,7 +158,9 @@ Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \te
 
 Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
 
-Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách ...
+Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách ... \TODO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
@@ -271,14 +277,26 @@ Zrejme $L(\gamma)$ je požadovaný jazyk.
 
 \section{Priestorová zložitosť}
 \begin{theorem}
-$\lel \subsetneq NSPACE(\log n)$, kde $n$ je veľkosť vstupu.
+$\lel \subseteq NSPACE(\log n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
+\begin{proof}
+Nech $\alpha\in\le$. Zostrojíme nedeterministický Turingov stroj akceptujúci $L(\alpha)$, ktorý bude mať vstupnú read--only pásku a 1 jednosmerne nekonečnú pracovnú pásku, na ktorej zapíše najviac $\log n$ políčok.
+
+Výpočet Turingovho stroja bude prebiehať podľa postupnosti konfigurácií formálneho modelu. Nemôžeme nič zapísať na vstupnú pásku a máme k dispozícii menej priestoru ako je dĺžka vstupu. Využijeme to, že pre vstup dĺžky $n$ vieme uložiť ľuboboľnú pozíciu na vstupe do adresy dĺžky $\log n$. Ukážeme, že takýchto adries potrebujeme konečný počet. Potom ich vieme písať nad seba do niekoľkých stôp pásky a mať tak zapísaných najviac $\log n$ políčok na páske.
+
+Celý regex $\alpha$ bude uložený v stave aj s ukazovateľom. Budú existovať stavy pre všetky možné pozície ukazovateľa a tzv. metaprechody budú medzi stavmi podľa definície kroku výpočtu na regexe. Medzi každými dvoma stavmi prepojenými metaprechodom môže byť potrebných až niekoľko prechodov cez pomocné stavy (napríklad keď narazí na otváraciu indexovateľnú zátvorku, na ktorú sa odkazujú spätné referencie, musí zapísať aktuálnu pracovnú adresu v slove ako začiatok podslova).
+
+Adresy budú potrebné pre zaznačenie aktuálnej pozície hlavy na vstupe, aktuálnej pracovnej pozície na vstupe a zapamätanie začiatku a konca podslova zodpovedajúceho $k$-tym zátvorkám, na ktoré sa odkazujú spätné referencie ($s$), začiatku každého lookaheadu ($l_a$) a look\-be\-hindu ($l_b$). K tomu bude potrebná 1 adresa na porovnávanie podslov na vstupe pri spätných referenciách. Z definície $\alpha$ je konečnej dĺžky a pre počty daných operácií platí $s+l_a+l_b \leq |\alpha|$. Spolu máme $1+1+2s+l_a+l_b+1 \leq 2|\alpha|+3$, čo je konštanta. 
+
+
+\end{proof}
+
 Dôsledok Savitchovej vety:
 \begin{theorem}
-$\lel \subsetneq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
+$\lel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 \begin{theorem}
-$\nlel \subsetneq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
+$\nlel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 
 \begin{theorem}
