@@ -160,6 +160,75 @@ Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktor�
 
 Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách ... \TODO
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}[I.]\label{dfkonfig}
+\item \underline{zhoda písmenka}
+\\ $\displaystyle \forall a \in \Sigma: ~(r_1 \dots \lceil a \dots r_n, w_1 \dots \lceil a \dots w_m)$ 
+$$ \vdash (r_1 \dots a\lceil \dots r_n, w_1 \dots a \lceil \dots w_m)$$
+\item \underline{zápis adresy zátvorky (}
+\\ Nech ( je indexovateľná, $k$-ta v poradí: 
+\\ $\displaystyle{ (r_1 \dots \lceil ( \dots r_n, w_1 \dots \lceil w_j \dots w_m)}$ 
+$$ (1) \vdash (r_1 \dots (\lceil \dots r_n, w_1 \dots \lceil \mathop{w_j}^k \dots w_m)$$
+Ak za jej uzatváracou zátvorkou nasleduje $*$, t.j. $\alpha$ je tvaru 
+$\displaystyle r_1 \dots \lceil ( \dots ) * \dots r_n$, potom 
+$$ (2) \vdash (r_1 \dots (\dots )* \lceil \dots r_n, w_1 \dots \lceil \mathop{\mathop{w_j}^k}^{k'} \dots w_m ) $$
+\item \underline{zápis adresy zátvorky )}
+\\ Nech ) je indexovateľná, $k$-ta v poradí: $\displaystyle (r_1 \dots \lceil ) \dots r_n, w_1 \dots \lceil w_j \dots w_m)$ 
+$$ \vdash (r_1 \dots )\lceil \dots r_n, w_1 \dots \lceil \mathop{w_j}^{k'} \dots w_m)$$
+\item \underline{výber možnosti v alternácii}
+\\ Nech podslová $\alpha_1, \alpha_2,\dots,\alpha_A$ regexu $\alpha$ sú všetkými členmi zobrazenej alternácie: $(r_1 \dots \lceil \alpha_1 | \alpha_2 | \dots | \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$
+$$(1) \vdash \textit{ďalší prechod v }\alpha_1$$
+$$(2) \vdash (r_1 \dots \alpha_1 | \lceil \alpha_2 | \dots | \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$$
+$$\vdots$$
+$$(A) \vdash (r_1 \dots \alpha_1 | \alpha_2 | \dots | \lceil \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$$
+\item \underline{skok z dokončenej možnosti na koniec alternácie}
+\\ Nech podslová $\alpha_1, \alpha_2,\dots,\alpha_A$ regexu $\alpha$ sú všetkými členmi zobrazenej alternácie, potom pre všetky možnosti:
+\\ $(r_1 \dots \alpha_1 \lceil | \alpha_2 | \dots | \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$,
+\\ $(r_1 \dots \alpha_1 | \alpha_2 \lceil | \dots | \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$,
+\\ \vdots \\ $(r_1 \dots \alpha_1 | \alpha_2 | \dots | \alpha_{A-1} \lceil | \alpha_A \dots r_n, w_1\dots \lceil w_j \dots w_m)$
+$$\vdash (r_1 \dots \alpha_1 | \alpha_2 | \dots | \alpha_A \lceil \dots r_n, w_1\dots \lceil w_j \dots w_m)$$
+\item \underline{skok Kleeneho $*$ za znakom}
+\\ $(r_1\dots a\lceil *\dots r_n, w_1\dots\lceil w_j\dots w_m)$
+$$(1) \vdash (r_1\dots a *\lceil\dots r_n, w_1\dots\lceil w_j\dots w_m)$$
+$$(2) \vdash (r_1\dots \lceil a *\dots r_n, w_1\dots\lceil w_j\dots w_m)$$
+\item \underline{skok Kleeneho $*$ za regexom v ( )}
+\\ $\displaystyle{(r_1 \dots \mathop{(}_k \dots \mathop{)}_k\lceil * \dots r_n, w_1 \dots \mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j \dots w_m)\footnotemark}$
+\footnotetext{Podľa definície spätných referencií platí podsledné podslovo nájdené regexom v $k$-tych zátvorkách. Pri tejto pracovnej pozícii v regexe je zrejmé, že nejde o prvý prechod cez tieto zátvorky a teda existuje také $a,b$, že $k$ je v slove nad $w_a$ a $k'$ nad $w_b$. Ak nastane prechod (2), pôvodné horné indexy $k, k'$ miznú a pridáva sa $k$ nad $w_j$.}
+$$(1) ~\vdash(r_1 \dots \mathop{(}_k \dots \mathop{)}_k *\lceil \dots r_n, w_1 \dots \mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j \dots w_m)$$
+$$(2) ~\vdash(r_1 \dots \mathop{(}_k\lceil \dots \mathop{)}_k * \dots r_n, w_1 \dots w_a \dots w_b \dots \lceil \mathop{w_j}^k \dots w_m)$$
+\item \underline{špeciálny ukazovateľ pre spätné referencie -- zjavenie}
+\\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\dots\mathop{w_b}^{k'}\dots \lceil w_j\dots w_m)}$
+$$\vdash(r_1 \dots \lceil \backslash k \dots r_n,w_1\ldots\intercal\mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)$$	
+\item \underline{porovnávanie spätnej referencie}
+\\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\ldots \intercal w_c \dots \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)}$, kde $a\leq c < b$ a zároveň $w_c = w_j$\footnote{$w_c$ a $w_j$ môžu byť poschodové symboly, avšak pri tejto rovnosti poschodia ignorujeme -- chceme porovnať iba písmenká v slove, prislúchajúce týmto pozíciám.}
+$$\vdash(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\dots w_c\intercal \dots \mathop{w_b}^{k'} \dots  w_j\lceil\dots w_m)$$
+\item \underline{špeciálny ukazovateľ pre spätné referencie -- zmiznutie}
+\\ $\displaystyle{(r_1 \dots \lceil \backslash k \dots r_n,w_1\dots\mathop{w_a}^k\ldots \intercal  \mathop{w_b}^{k'} \dots \lceil w_j\dots w_m)}$
+$$\vdash(r_1 \dots  \backslash k \lceil \dots r_n,w_1\dots\mathop{w_a}^k\dots \mathop{w_b}^{k'} \dots  w_j\lceil\dots w_m)$$
+\item \underline{lookahead -- začiatok a jeho záznam} 
+\\ Nech $\lookahead \dots$) je $k$-ty pozitívny lookahead v poradí: 
+\\ $\displaystyle{(r_1\dots \lceil \lookahead \dots) \dots r_n, w_1\dots\lceil w_j\dots w_m )}$
+$$ \vdash(r_1\dots \lookahead\lceil\dots) \dots r_n, w_1\dots\lceil \mathop{w_j}^{\mathop{k}^\rightarrow}\dots w_m ) $$
+\item \underline{lookahead -- koniec, skok a vymazanie záznamu}
+\\ Nech ) patrí ku $k$-temu pozitívnemu lookaheadu v poradí: 
+\\ $\displaystyle{(r_1\dots \lookahead\dots\lceil) \dots r_n, w_1\dots \mathop{w_l}^{\mathop{k}^\rightarrow}\dots\lceil w_j\dots w_m )} $
+$$ \vdash(r_1\dots \lookahead\dots)\lceil \dots r_n, w_1\dots \lceil w_l \dots w_j\dots w_m ) $$
+\item \underline{lookbehind -- začiatok, jeho záznam a skok}
+\\ Nech $\lookbehind\dots)$ je $k$-ty pozitívny lookbehind v poradí, $\forall L\in\lbrace 0,\dots, j-1\rbrace$:
+\\ $\displaystyle{(r_1\dots \lceil \lookbehind\dots) \dots r_n, w_1\dots\lceil w_j\dots w_m )}$
+$$ \vdash (r_1\dots \lookbehind\lceil\dots) \dots r_n, w_1\dots\lceil w_{j-L}\dots \mathop{w_j}^{\mathop{k}^\leftarrow} \dots w_m ) $$
+\item \underline{lookbehind -- koniec a vymazanie záznamu}
+\\ Nech ) patrí ku $k$-temu pozitívnemu lookbehindu v poradí:
+\\ $\displaystyle{(r_1\dots \lookbehind\dots\lceil) \dots r_n, w_1\dots \lceil \mathop{w_j}^{\mathop{k}^\leftarrow} \dots w_m )}$
+$$ \vdash(r_1\dots \lookbehind\dots)\lceil \dots r_n, w_1 \dots \lceil w_j \dots w_m ) $$
+\item \underline{negatívny lookahead}
+\\ Ak $\nexists p \in \lbrace j,\dots,m\rbrace: (\lceil r_k\dots r_l,\lceil w_j\dots w_p) \vdash^* (r_k\dots r_l\lceil, w_j\dots w_p \lceil)$, potom:
+\\$\displaystyle{(r_1\dots\lceil \nlookahead r_{k}\dots r_{l} ) \dots r_n, w_1\dots \lceil w_j \dots w_m)}$
+$$\vdash (r_1\dots \nlookahead r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lceil w_j \dots w_m)$$
+\item \underline{negatívny lookbehind}
+\\ Ak $\nexists p \in \lbrace 1,\dots,j-1\rbrace: (\lceil r_k\dots r_l,\lceil w_p\dots w_{j-1}) \vdash^* (r_k\dots r_l\lceil, w_p \dots w_{j-1} \lceil)$, potom:
+\\$\displaystyle{(r_1\dots\lceil \nlookbehind r_{k}\dots r_{l} ) \dots r_n, w_1\dots \lceil w_j \dots w_m)}$
+$$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lceil w_j \dots w_m)$$
+\end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
@@ -255,6 +324,9 @@ Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neob
 \item $\exists k \in \N,~k\neq 0;~\forall j = 1,2,\ldots: xy^{kj} \in L(\alpha)$
 \end{enumerate}
 \end{theorem}
+\begin{proof}
+\TODO
+\end{proof}
 
 \begin{theorem}
 Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
