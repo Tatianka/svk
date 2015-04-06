@@ -10,7 +10,7 @@
 \usepackage{color}
 \usepackage{amsmath}
 
-\definecolor{ltyelloow}{rgb}{.99,1,0.96}
+\definecolor{ltyelloow}{rgb}{0.99,1,0.96}
 
 %definície pre foju
 %\newtheorem{veta}{Veta}[section] 
@@ -163,9 +163,10 @@ Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \te
 
 Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
 
-Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách nasledovne:
+\begin{definition}\label{dfkonfig}
+\textbf{Krok výpočtu} je relácia $\vdash$ na konfiguráciách definovaná nasledovne:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{enumerate}[I.]\label{dfkonfig}
+\begin{enumerate}[I.]
 \item \underline{zhoda písmenka}
 \\ $\displaystyle \forall a \in \Sigma: ~(r_1 \dots \lceil a \dots r_n, w_1 \dots \lceil a \dots w_m)$ 
 $$ \vdash (r_1 \dots a\lceil \dots r_n, w_1 \dots a \lceil \dots w_m)$$
@@ -235,6 +236,7 @@ $$\vdash (r_1\dots \nlookahead r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lce
 $$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lceil w_j \dots w_m)$$
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{definition}
 
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
@@ -404,16 +406,10 @@ Dôsledok Savitchovej vety \cite{Savitch}:
 \begin{theorem}\label{lel_dspace}
 $\lel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
-\begin{theorem}
+\begin{theorem}\label{nlel_dspace}
 $\nlel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
-\begin{proof}
-Nech $\alpha\in\nle$. Zostrojíme Turingov stroj $T$, ktorý bude akceptovať $L(\alpha)$ a na pracovných páskach nezapíše viac ako $O(\log^2 n)$ políčok.
-
-Pokiaľ $\alpha$ neobsahuje negatívny lookaround, tvrdenie triviálne vyplýva z vety \ref{lel_dspace}. Nech teda obsahuje aspoň jeden negatívny lookaround a nech $k$ je najvyšší počet negatívnych lookaroundov vnorených do seba (nezáleží na tom, či sú to lookaheady alebo look\-behindy).
-
-$T$ bude skonštruovaný ako Turingov stroj vo vete \ref{lel_dspace}. Jediné, čo je treba, je dodefinovať jeho správanie, keď narazí na negatívny lookaround. Predpokladajme, že $\alpha$ obsahuje práve jeden negatívny lookaround. Vnútri tohto lookaroundu je nejaký regex $\beta$ taký, že $\beta\in\le$. Ten vieme podľa vety simulovať deterministickým Turignovým strojom a spotrebuje pamäť $O(\log^2|\beta|)$.
-\end{proof}
+Dôkaz tejto vety uvedieme neskôr.
 
 V praxi je bežné, že užívateľ zadáva nielen vstupný text, ale aj samotný regex. Preto sme sa rozhodli analyzovať jazyk, ktorý dostane na vstup oboje -- slovo $regex\#word$-- a akceptuje slovo len vtedy, ak slovo $word$ vyhovuje regexu $regex$.
 
@@ -426,13 +422,13 @@ Myšlienka dôkazu je podobná ako v dôkaze \ref{lere_nspace(logn)}. Rozdiel je
 Turingov stroj bude fungovať ako v dôkaze \ref{lere_nspace(logn)}, ale odhad zapísanej pamäte bude $(r+3)\cdot \log w + 2\log r$. Všetky pozície v slove vieme adresovať od oddeľovača \#, preto zaberú $\log w$ pamäte. Na záver pribudla pracovná a aktuálna pozícia v regexe, z nich každá potrebuje $\log r$ políčok. Dokopy Turingov stroj zapíše $O(r\log w)$ pamäte.
 \end{proof}
 
-\begin{theorem}
+\begin{theorem}\label{regexword_dspace}
 $L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vstupu.
 \end{theorem}
 \begin{proof} 
 Nech $r=|regex|,~w=|word|$.
 
-Myšlienka je podobná dôkazu Savitchovej vety\cite{Savitch}. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
+Myšlienka je podobná dôkazu Savitchovej vety\cite{Savitch_skripta}. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
 \lstset{numbers=left, tabsize=4, morekeywords={if,then,return,true,false}, columns=fullflexible, breaklines=true, numbersep=2pt,backgroundcolor=\color{ltyelloow}}
 \begin{lstlisting}[mathescape]
 bool $TESTUJ(C_1,C_2,i)$
@@ -443,7 +439,7 @@ bool $TESTUJ(C_1,C_2,i)$
 		if $(TESTUJ(C_1, C_3,\lfloor \frac{i}{2}\rfloor)$ $\wedge ~TESTUJ(C_3, C_2,\lceil \frac{i}{2}\rceil))$ then 		return true
 	return false
 \end{lstlisting}
-Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(r\log w)$ pamäte.
+Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- pracovná pozícia v regexe, pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$. Globálne si budeme pamätať ešte aktuálnu pozíciu v regexe a v slove, kvôli orientácii a prípadnému kopírovaniu adries. Spolu to zaberie $\log r+(1+2z+l_a+l_b)\cdot \log w + \log r+\log w \leq O(r\log w)$ pamäte.
 
 Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z lemy \ref{lema_dlzka_post_konfig}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
 
@@ -461,6 +457,28 @@ Riadok 2 je porovnanie rovnosti adries -- pracovnú pozíciu porovnávania si m�
 \end{description}
 Indexovateľnosť a ukazovateľ sa skontrolujú bez použitia pomocnej pamäte. Adresy využívajú porovnávanie, ale to vieme spraviť pomocou poschodových symbolov. Alternovateľnosť využíva algoritmus na kontrolu zátvoriek -- zisťuje, či je alternácia uzavretá zátvorkami (ak hej, ktorými) alebo nie. Počet zátvoriek je najviac $\frac{r}{2}$. Používame algoritmus, kde je ( priradíme 1 a ) hodnotu -1\footnote{Ak počítame sprava doľava, obe hodnoty prenásobíme $(-1)$, aby sme pri prvej zátvorke nemali súčet $0+(-1)$.}. Pri každom výskyte sa hodnoty sčítavajú, 0 je dobre uzátvorkovaný výraz. Kontrola sa vykoná a súčet po nej už nepotrebujeme, preto ho môžeme dočasne zapísať na koniec zásobníka a vzápätí vymazať. Zapísaná pamäť tak bude $r+O(n\log^2n)=O(n\log^2n)$.
 \end{proof}
+
+Tu už nasleduje sľubovaný dôkaz vety \ref{nlel_dspace}. Budeme čerpať z dôkazu predošlej vety.
+\begin{proof}
+Nech $\alpha\in\nle$ a $r=|\alpha|$. Zostrojíme Turingov stroj $T$, ktorý bude akceptovať $L(\alpha)$ a na pracovných páskach nezapíše viac ako $O(\log^2 n)$ políčok.
+
+Pokiaľ $\alpha$ neobsahuje negatívny lookaround, tvrdenie triviálne vyplýva z vety \ref{lel_dspace}. Nech teda obsahuje aspoň jeden negatívny lookaround a nech $k$ je najvyšší počet negatívnych lookaroundov vnorených do seba (nezáleží na tom, či sú to lookaheady alebo look\-behindy).
+
+$T$ bude skonštruovaný ako Turingov stroj vo vete \ref{regexword_dspace}, pričom budeme musieť dodefinovať správanie v prípade negatívneho lookaroundu. V definícii \ref{dfkonfig} v bodoch XV. a XIV. je napísané, že ak splníme nejakú podmieku, negatívny lookaround možno preskočiť a pokračovať ďalej vo výpočte. Podmienka začína ,,neexistuje výpočet'', čo naznačuje, že musíme vyskúšať všetky možnosti -- teda mať deterministický algoritmus, ktorý akceptuje práve vtedy, keď akceptačný výpočet existuje.
+
+Vhodným algoritmom je procedúra $TESTUJ$. Zakaždým, keď $T$ bude overovať podmienku $C_1\mathop{\vdash}^? C_2$ a jedná sa o prechod XV. alebo XIV. z definície \ref{dfkonfig}, stane sa nasledovné. $T$ spustí na novej páske novú procedúru $TESTUJ(C_0',C_a',c')$, kde $C_0'$ je počiatočná a $C_a'$ akceptačná konfigurácia z definície daného kroku a $c' \leq c$ je hodnota z lemy \ref{lema_dlzka_post_konfig} pre regex vo vnútri tohto negatívneho lookaroundu. Túto procedúru treba spustiť niekoľkokrát po sebe -- pre každé $p$, čo prichádza do úvahy. Pokiaľ niektorý z behov procedúry $TESTUJ$ skončí úspešne, znamená to, že existuje akceptačný výpočet tam, kde nechceme, aby existoval -- podmienka negatívneho lookaroundu neplatí a výsledok je $C_1\nvdash C_2$. Ak všetky behy skončia s výsledkom \textit{false}, výsledok je $C_1\vdash C_2$.
+
+Vynechali sme detail ,,spustenie pre každé p, čo prichádza do úvahy''. Tu je treba zadať hranice podslova, na ktorom sa pracuje, a neprekročiť ich. Jednoducho zakomponujeme do procedúry kontrolu, či sú všetky adresy a ukazovateľ pre toto spustenie povolené. Tieto hodnoty sú globálne a zapisujú sa pri prvom volaní na začiatok zásobníka. Pre hlavný beh procedúry to budú hodnoty 0 a $n$.
+
+Popísali sme správanie $T$, pre prípady, keď operácie negatívneho lookaroundu nie sú vnorené. Opíšme tie. $T$ má na 1. páske rozpracovanú hlavnú vetvu $TESTUJ$, teraz pracuje na 2. páske na negatívnom lookarounde a narazí na ďalší. Uvedomme si, že pre $T$ je to rovnaká situácia, akokeby pracoval stále na 1. páske. Zopakuje postup popísaný vyššie -- niekoľkokrát spustí $TESTUJ$ na 3. páske pre vhodné hranice slov a ak výsledkom kadžého behu bude \textit{false}, vráti sa na 2. pásku. Nech regex $\alpha$ má $k$ vnorených negatývnych lookaroundov, potom $T$ bude potrebovať $k+1$ pracovných pások.
+
+Pre spočítanie zapísaných políčok si najprv popíšme konfigurácie. Regex poznáme dopredu. To znamená, že pre každú polohu ukazovateľa v regexe vieme mať znak v pracovnej abecede (t.j. $r+1$ špeciálnych symbolov). Zároveň pre výpočty na negatívnych lookaroundoch nám stačí ich vnútorný regex s ukazovateľom. Takýchto podslov je konečne veľa, preto aj pre tie vieme mať samostatné špeciálne symboly. 
+
+Adresy, ktoré v konfiguráciách potrebujeme sú: pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $l_a$ a lookbehindu $(l_b)$. Spolu $1+2z+l_a+l_b \leq 2r+1$ adries a to je konštanta. Konštantný počet adries vieme umiestniť nad seba do konštantného počtu stôp na páske (ako v dôkaze \ref{lere_nspace(logn)}) a takto nimi zaberieme $\log n$ políčok (symbol pre stav regexu bude v samostatnej najvrchnejšej stope).
+
+Jedno volanie procedúry $TESTUJ$ potrebuje 3 konfigurácie a konštantný počet políčok. Hĺbka vnorenia rekurzie je na každej páske najviac $\log c=O(\log r + \log w) = O(\log n)$. Dokopy bude na každej páske zapísaných najviac $\log n \cdot O(\log n) = O(\log^2n)$ políčok.
+\end{proof}
+
 
 \section*{Poďakovanie}
 Ďakujem školiteľovi za cenné rady a pripomienky.
