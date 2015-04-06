@@ -9,6 +9,7 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{color}
 \usepackage{amsmath}
+\usepackage{textcomp}
 
 \definecolor{ltyelloow}{rgb}{0.99,1,0.96}
 
@@ -464,19 +465,19 @@ Nech $\alpha\in\nle$ a $r=|\alpha|$. Zostrojíme Turingov stroj $T$, ktorý bude
 
 Pokiaľ $\alpha$ neobsahuje negatívny lookaround, tvrdenie triviálne vyplýva z vety \ref{lel_dspace}. Nech teda obsahuje aspoň jeden negatívny lookaround a nech $k$ je najvyšší počet negatívnych lookaroundov vnorených do seba (nezáleží na tom, či sú to lookaheady alebo look\-behindy).
 
-$T$ bude skonštruovaný ako Turingov stroj vo vete \ref{regexword_dspace}, pričom budeme musieť dodefinovať správanie v prípade negatívneho lookaroundu. V definícii \ref{dfkonfig} v bodoch XV. a XIV. je napísané, že ak splníme nejakú podmieku, negatívny lookaround možno preskočiť a pokračovať ďalej vo výpočte. Podmienka začína ,,neexistuje výpočet'', čo naznačuje, že musíme vyskúšať všetky možnosti -- teda mať deterministický algoritmus, ktorý akceptuje práve vtedy, keď akceptačný výpočet existuje.
+$T$ bude skonštruovaný ako Turingov stroj vo vete \ref{regexword_dspace}, pričom musíme dodefinovať správanie v prípade negatívneho lookaroundu. V definícii \ref{dfkonfig} v bodoch XV. a XIV. je napísané, že ak splníme istú podmieku, negatívny lookaround možno preskočiť a pokračovať ďalej vo výpočte. Podmienka začína ,,neexistuje výpočet'', čo naznačuje, že musíme vyskúšať všetky možnosti postupnosti konfigurácií -- teda mať deterministický algoritmus, ktorý akceptuje práve vtedy, keď akceptačný výpočet existuje.
 
 Vhodným algoritmom je procedúra $TESTUJ$. Zakaždým, keď $T$ bude overovať podmienku $C_1\mathop{\vdash}^? C_2$ a jedná sa o prechod XV. alebo XIV. z definície \ref{dfkonfig}, stane sa nasledovné. $T$ spustí na novej páske novú procedúru $TESTUJ(C_0',C_a',c')$, kde $C_0'$ je počiatočná a $C_a'$ akceptačná konfigurácia z definície daného kroku a $c' \leq c$ je hodnota z lemy \ref{lema_dlzka_post_konfig} pre regex vo vnútri tohto negatívneho lookaroundu. Túto procedúru treba spustiť niekoľkokrát po sebe -- pre každé $p$, čo prichádza do úvahy. Pokiaľ niektorý z behov procedúry $TESTUJ$ skončí úspešne, znamená to, že existuje akceptačný výpočet tam, kde nechceme, aby existoval -- podmienka negatívneho lookaroundu neplatí a výsledok je $C_1\nvdash C_2$. Ak všetky behy skončia s výsledkom \textit{false}, výsledok je $C_1\vdash C_2$.
 
-Vynechali sme detail ,,spustenie pre každé p, čo prichádza do úvahy''. Tu je treba zadať hranice podslova, na ktorom sa pracuje, a neprekročiť ich. Jednoducho zakomponujeme do procedúry kontrolu, či sú všetky adresy a ukazovateľ pre toto spustenie povolené. Tieto hodnoty sú globálne a zapisujú sa pri prvom volaní na začiatok zásobníka. Pre hlavný beh procedúry to budú hodnoty 0 a $n$.
+Vynechali sme detail ,,spustenie pre každé p, čo prichádza do úvahy''. Tu je treba zadať hranice podslova, na ktorom procedúra pracuje, a neprekročiť ich. Jednoducho zakomponujeme do procedúry kontrolu, či sú všetky adresy a ukazovateľ pre toto spustenie v povolenom intervale. Tieto hodnoty sú globálne a zapisujú sa pri prvom volaní na začiatok zásobníka. Pre hlavný beh procedúry to budú hodnoty 0 a $n+1$ (t.j. interval $\langle 0,n+1)$).
 
-Popísali sme správanie $T$, pre prípady, keď operácie negatívneho lookaroundu nie sú vnorené. Opíšme tie. $T$ má na 1. páske rozpracovanú hlavnú vetvu $TESTUJ$, teraz pracuje na 2. páske na negatívnom lookarounde a narazí na ďalší. Uvedomme si, že pre $T$ je to rovnaká situácia, akokeby pracoval stále na 1. páske. Zopakuje postup popísaný vyššie -- niekoľkokrát spustí $TESTUJ$ na 3. páske pre vhodné hranice slov a ak výsledkom kadžého behu bude \textit{false}, vráti sa na 2. pásku. Nech regex $\alpha$ má $k$ vnorených negatývnych lookaroundov, potom $T$ bude potrebovať $k+1$ pracovných pások.
+Popísali sme správanie $T$, pre prípady, keď operácie negatívneho lookaroundu nie sú vnorené. Zoberme si prípad, keď ich $\alpha$ obsahuje niekoľko vnorených. $T$ má na 1. páske rozpracovanú hlavnú vetvu $TESTUJ$, teraz pracuje na 2. páske na negatívnom lookarounde a narazí na ďalší. Uvedomme si, že pre $T$ je to rovnaká situácia, akokeby pracoval stále na 1. páske. Zopakuje postup popísaný vyššie -- niekoľkokrát spustí $TESTUJ$ na 3. páske pre vhodné hranice slov a ak výsledkom kadžého behu bude \textit{false}, vráti sa na 2. pásku. Nech regex $\alpha$ má $k$ vnorených negatývnych lookaroundov, potom $T$ bude potrebovať $k+1$ pracovných pások.
 
-Pre spočítanie zapísaných políčok si najprv popíšme konfigurácie. Regex poznáme dopredu. To znamená, že pre každú polohu ukazovateľa v regexe vieme mať znak v pracovnej abecede (t.j. $r+1$ špeciálnych symbolov). Zároveň pre výpočty na negatívnych lookaroundoch nám stačí ich vnútorný regex s ukazovateľom. Takýchto podslov je konečne veľa, preto aj pre tie vieme mať samostatné špeciálne symboly. 
+Pre spočítanie zapísaných políčok na páskach si najprv popíšme konfigurácie. Regex poznáme dopredu. To znamená, že pre každú polohu ukazovateľa v regexe vieme mať 1 znak v pracovnej abecede (t.j. $r+1$ špeciálnych symbolov). Zároveň pre výpočty na negatívnych lookaroundoch nám stačí ich vnútorný regex s ukazovateľom. Takýchto podslov je konečne veľa, preto aj pre tie vieme mať samostatné špeciálne symboly. 
 
 Adresy, ktoré v konfiguráciách potrebujeme sú: pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $l_a$ a lookbehindu $(l_b)$. Spolu $1+2z+l_a+l_b \leq 2r+1$ adries a to je konštanta. Konštantný počet adries vieme umiestniť nad seba do konštantného počtu stôp na páske (ako v dôkaze \ref{lere_nspace(logn)}) a takto nimi zaberieme $\log n$ políčok (symbol pre stav regexu bude v samostatnej najvrchnejšej stope).
 
-Jedno volanie procedúry $TESTUJ$ potrebuje 3 konfigurácie a konštantný počet políčok. Hĺbka vnorenia rekurzie je na každej páske najviac $\log c=O(\log r + \log w) = O(\log n)$. Dokopy bude na každej páske zapísaných najviac $\log n \cdot O(\log n) = O(\log^2n)$ políčok.
+Jedna inštancia procedúry $TESTUJ$ potrebuje 3 konfigurácie a konštantný počet políčok. Hĺbka vnorenia rekurzie je na každej páske najviac $\log c=O(\log r + \log w) = O(\log n)$. Každé prvé volanie potrebuje navyše aktuálnu pozíciu hlavy na vstupe a hranice podslova, na ktorom pracuje. Dokopy bude na každej páske zapísaných najviac $\log n \cdot O(\log n) + 3\log n = O(\log^2n)$ políčok.
 \end{proof}
 
 
