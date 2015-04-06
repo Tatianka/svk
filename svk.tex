@@ -10,6 +10,8 @@
 \usepackage{color}
 \usepackage{amsmath}
 
+\definecolor{ltyelloow}{rgb}{.99,1,0.96}
+
 %definície pre foju
 %\newtheorem{veta}{Veta}[section] 
 %\newtheorem{df}[veta]{Definícia}
@@ -161,7 +163,7 @@ Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \te
 
 Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
 
-Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách ... \TODO
+Definujeme \textbf{krok výpočtu} ako reláciu $\vdash$ na konfiguráciách nasledovne:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[I.]\label{dfkonfig}
 \item \underline{zhoda písmenka}
@@ -291,10 +293,16 @@ Vieme totiž vygenerovať jazyk $a^nb^nc^n$ prienikom jazykov $a*b^nc^n$ a $a^nb
 \begin{theorem}
 $\L_{CS}$ je uzavretá na pozitívny lookaround.
 \end{theorem}
+\begin{proof}
+Nech jazyky $L_1,L_2,L_3\in\L_{CS}$, potom ukážeme, že $L_1\lookahead L_2)L_3, ~L_1\lookbehind L_2) L_3 \in\L_{CS}$. Ku každému $L_i$ existuje Turingov stroj $T_i$, ktorý ho akcpetuje. Zostrojíme nedeterministický Turingov stroj $T$ pre lookahead.
+
+$T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstupné slovo $w$ na $w_1,w_2, w_3$ tak, že $w = w_1w_3$ a $w_3=w_2x$ pre nejaké $x$ ($w_1=xw_2$ v prípade lookbehindu). Na jednu pracovnú pásku prepíše $w_1$ a bude simulovať $T_1$. Keď akceptuje, pásku vymaže, zapíše tam $w_2$ a bude simulovať $T_2$. Ak aj ten akceptuje, pásku vymaže, zapíše tam $w_3$ a bude simulovať $T_3$. Ak $T_3$ akceptuje, bude akceptovať aj $T$. Zrejme akceptuje požadovaný jazyk.
+\end{proof}
 
 \begin{theorem}
 Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
 \end{theorem}
+\TODO
 
 \section{Chomského hierarchia}
 \begin{theorem}
@@ -418,16 +426,14 @@ $L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vs
 Nech $r=|regex|,~w=|word|$.
 
 Myšlienka je podobná dôkazu Savitchovej vety. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
-\lstset{numbers=left, tabsize=4, morekeywords={if,then,return,true,false}, columns=fullflexible}
+\lstset{numbers=left, tabsize=4, morekeywords={if,then,return,true,false}, columns=fullflexible, breaklines=true, numbersep=2pt,backgroundcolor=\color{ltyelloow}}
 \begin{lstlisting}[mathescape]
 bool $TESTUJ(C_1,C_2,i)$
 	if ($C_1 == C_2$) then return true
 	if ($i>0 ~\wedge~ C_1\vdash C_2$) then return true
 	if ($i<=1$) return false
-	iteruj cez vsetky konfiguracie $C_3$
-		if $(TESTUJ(C_1, C_3,\lfloor \frac{i}{2}\rfloor)$
-				$\wedge ~TESTUJ(C_3, C_2,\lceil \frac{i}{2}\rceil))$ then
-			return true
+	$\text{iteruj cez všetky konfigurácie } C_3$
+		if $(TESTUJ(C_1, C_3,\lfloor \frac{i}{2}\rfloor)$ $\wedge ~TESTUJ(C_3, C_2,\lceil \frac{i}{2}\rceil))$ then 		return true
 	return false
 \end{lstlisting}
 Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(r\log w)$ pamäte.
