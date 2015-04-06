@@ -238,9 +238,9 @@ $$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lc
 
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,w\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
-\begin{theorem}
+\begin{lemma}
 Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|^2\cdot|w|$ konfigurácií.
-\end{theorem}
+\end{lemma}
 \begin{proof}
 Vo väčšine krokov výpočtu sa posúvame dopredu buď v regexe alebo v slove alebo v oboch. Takéto kroky vedú k postupnosti dĺžky najviac $|\alpha|+|w|$.
 
@@ -251,9 +251,9 @@ Výpočet môže predĺžiť skákanie ukazovateľa dozadu. V krokoch VI.(2),VII
 Teda dokopy spravíme najviac $|\alpha|+|w|+2\cdot|\alpha|+|\alpha|\cdot|w| \leq 5\cdot|\alpha|\cdot|w|$ krokov.
 \end{proof}
 
-\begin{theorem}\label{lema_dlzka_post_konfig}
+\begin{lemma}\label{lema_dlzka_post_konfig}
 Nech $\alpha \in \lel,~ w \in L(\alpha),~ r = |\alpha|$ a $v = |w|$. Potom existuje akceptačný výpočet, ktorý má nanajvýš $O(r^2w^3)$ konfigurácií.
-\end{theorem}
+\end{lemma}
 \begin{proof}
 Spočítajme, koľko je všetkých konfigurácií pre regex $\alpha$ a slovo $w$.
 
@@ -269,9 +269,8 @@ Všetkých možných konfigurácií je dohromady
 Späť k akceptačnému výpočtu. Nech sú všetky akceptačné výpočty dlhšie ako \eqref{eq_pocet_konfig}. Potom tento výpočet musí nutne obsahovať 2 rovnaké konfigurácie. Keď vymažeme úsek medzi rovnakými konfiguráciami a napojíme postupnosť, dostaneme opäť validný akceptačný výpočet. Postup opakujeme, pokým výpočet obsahuje nejaké 2 rovnaké konfigurácie. Keď skončíme, sú všetky konfigurácie vo výpočte rôzne a preto má najviac \eqref{eq_pocet_konfig} konfigurácií.
 \end{proof}
 
- 
 \section{Vlastnosti lookaroundu}
-Na začiatok sme zisťovali, čo robia samotné operácie lookaroundu.
+Na zoznámenie s novou operáciou sme skúsili zistiť uzavretosť tried Chomského hierarchie.
 \begin{theorem}
 $\R$ je uzavretá na negatívny a pozitívny lookaround.
 \end{theorem}
@@ -288,7 +287,9 @@ Odhliadnuc teraz od lookaroundu, máme zreťazenie $L_1$ a $L_3$. Preto prepojí
 \begin{theorem}
 $\L_{CF}$ nie je uzavretá na pozitívny lookaround.
 \end{theorem}
-Vieme totiž vygenerovať jazyk $a^nb^nc^n$ prienikom jazykov $a*b^nc^n$ a $a^nb^nc*$.
+Vieme totiž vygenerovať jazyk $L=\lbrace a^nb^nc^n|n\in\N\rbrace$ pomocou jazykov $L_1=\lbrace a*b^nc^n|n\in\N\rbrace$ a $L_2=\lbrace a^nb^nc*|n\in\N\rbrace$: $L=\lookahead L_1)L_2 =L_1\lookbehind L_2)$.
+
+Takýto výsledok bol očakávateľný, pretože lookaround robí uzavretosť na prienik a to trieda bezkontextových jazykov nie je.
 
 \begin{theorem}
 $\L_{CS}$ je uzavretá na pozitívny lookaround.
@@ -312,13 +313,15 @@ $\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
 
 Všetky $\subseteq$ triviálne platia.
 
+$\R \subsetneq \el$: \cite{ExtendedRegexPower}
+
 $\el \subsetneq \lel$: Nerovnosť dokazuje jazyk $L=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ pre nejaké } k'>0,i>0\rbrace$. $L\notin\e$ podľa pumpovacej lemy z \cite{ExtendedRegexIntersec} a tu je regex z $\le$ pre L: 
 $\alpha=\displaystyle{\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b \lookahead (\backslash 1) *\$ ) (\backslash 2)* }$
 
 $\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace \notin \L_{CF}$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace \in \L_{CF}$.
 \end{proof}
 
-Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$.
+Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$. Avšak na dokázanie $L(\alpha)\notin\lel$ zatiaľ nemáme šikovné prostriedky a preto to zostáva netriviálnym otvoreným problémom.
 
 \section{Vlastnosti triedy $\lel$}
 
@@ -397,15 +400,19 @@ Kroky výpočtu I., IV., V., VI., VII.(1) nepotrebujú pomocné stavy. Ostatné 
 Preto T akceptuje $L(\alpha)$ a spĺňa pamäťové požiadavky.
 \end{proof}
 
-Dôsledok Savitchovej vety:
-\begin{theorem}
+Dôsledok Savitchovej vety \cite{Savitch}:
+\begin{theorem}\label{lel_dspace}
 $\lel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 \begin{theorem}
 $\nlel \subseteq DSPACE(\log^2 n)$, kde $n$ je veľkosť vstupu.
 \end{theorem}
 \begin{proof}
-\TODO
+Nech $\alpha\in\nle$. Zostrojíme Turingov stroj $T$, ktorý bude akceptovať $L(\alpha)$ a na pracovných páskach nezapíše viac ako $O(\log^2 n)$ políčok.
+
+Pokiaľ $\alpha$ neobsahuje negatívny lookaround, tvrdenie triviálne vyplýva z vety \ref{lel_dspace}. Nech teda obsahuje aspoň jeden negatívny lookaround a nech $k$ je najvyšší počet negatívnych lookaroundov vnorených do seba (nezáleží na tom, či sú to lookaheady alebo look\-behindy).
+
+$T$ bude skonštruovaný ako Turingov stroj vo vete \ref{lel_dspace}. Jediné, čo je treba, je dodefinovať jeho správanie, keď narazí na negatívny lookaround. Predpokladajme, že $\alpha$ obsahuje práve jeden negatívny lookaround. Vnútri tohto lookaroundu je nejaký regex $\beta$ taký, že $\beta\in\le$. Ten vieme podľa vety simulovať deterministickým Turignovým strojom a spotrebuje pamäť $O(\log^2|\beta|)$.
 \end{proof}
 
 V praxi je bežné, že užívateľ zadáva nielen vstupný text, ale aj samotný regex. Preto sme sa rozhodli analyzovať jazyk, ktorý dostane na vstup oboje -- slovo $regex\#word$-- a akceptuje slovo len vtedy, ak slovo $word$ vyhovuje regexu $regex$.
@@ -422,10 +429,10 @@ Turingov stroj bude fungovať ako v dôkaze \ref{lere_nspace(logn)}, ale odhad z
 \begin{theorem}
 $L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vstupu.
 \end{theorem}
-\begin{proof} \TODO zdroj Savitchovej vety
+\begin{proof} 
 Nech $r=|regex|,~w=|word|$.
 
-Myšlienka je podobná dôkazu Savitchovej vety. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
+Myšlienka je podobná dôkazu Savitchovej vety\cite{Savitch}. Turingov stroj T bude testovať, či sa dá dostať z konfigurácie $C_1$ do konficurácie $C_2$ na $i$ krokov:
 \lstset{numbers=left, tabsize=4, morekeywords={if,then,return,true,false}, columns=fullflexible, breaklines=true, numbersep=2pt,backgroundcolor=\color{ltyelloow}}
 \begin{lstlisting}[mathescape]
 bool $TESTUJ(C_1,C_2,i)$
@@ -438,7 +445,7 @@ bool $TESTUJ(C_1,C_2,i)$
 \end{lstlisting}
 Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané ako niekoľko adries -- aktuálna pozícia a pracovná pozícia v regexe, aktuálna a pracovná pozícia v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$ -- spolu $2\log r+(2z+l_a+l_b)\cdot \log w \leq O(r\log w)$ pamäte.
 
-Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z vety \ref{lema_dlzka_post_konfig}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
+Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z lemy \ref{lema_dlzka_post_konfig}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
 
 Procedúra $TESTUJ$ je rekurzívna. Preto bude na pracovnej páske stroja T zásobník. Pre každú inštanciu procedúry bude mať uložené konfigurácie $C_1, C_2, C_3, c$ a informáciu, či sa vrátil z prvého alebo druhého volania (potrebný 1 bit informácie). Hodnotu $c$ vieme zapísať do priestoru $\log c = O(\log r + \log w)$, teda jeden záznam tak zaberie $3r\log w + \log c = O(r\log w)$ pamäte. Keďže parameter $i$ je vždy o polovicu menší, hĺbka rekurzie bude $\log c$.
 
