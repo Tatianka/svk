@@ -303,13 +303,15 @@ Nech jazyky $L_1,L_2,L_3\in\L_{CS}$, potom ukážeme, že $L_1\lookahead L_2)L_3
 $T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstupné slovo $w$ na $w_1,w_2, w_3$ tak, že $w = w_1w_3$ a $w_3=w_2x$ pre nejaké $x$ ($w_1=xw_2$ v prípade lookbehindu). Na jednu pracovnú pásku prepíše $w_1$ a bude simulovať $T_1$. Keď akceptuje, pásku vymaže, zapíše tam $w_2$ a bude simulovať $T_2$. Ak aj ten akceptuje, pásku vymaže, zapíše tam $w_3$ a bude simulovať $T_3$. Ak $T_3$ akceptuje, bude akceptovať aj $T$. Zrejme akceptuje požadovaný jazyk.
 \end{proof}
 
-\begin{theorem}
+\begin{theorem}\label{re_lalb_in_R}
 Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
 \end{theorem}
 \TODO
 
+
+Nasledujúca veta hovorí, že do lookaheadu stačí dávať z každého jazyka jeho prefixovú podmnožinu\footnote{T.j. z jazyka $L$ stačí $L_p=\lbrace u~|~ u\in L \wedge \nexists v \in L: u = vx \rbrace$.}. Akonáhle lookahead nájde prefix, akceptuje a ku zvyšku slova sa nikdy neprepracuje. Podobne to platí pre lookehind a sufixovú podmnožinu jazyka. 
 \begin{theorem}\label{bezprefixove}
-Nech $L$ je ľubovoľný jazyk a $L_p = L \cup \lbrace uv ~|~ u \in L \rbrace$. Nech $\alpha$ je ľubovoľný regulárny výraz taký, že obsahuje $(?=L_p)$. Potom ak prepíšeme tento lookahead na $(?=L)$ (nazvime to $\alpha '$), bude platiť $L(\alpha ') = L(\alpha )$. Analogicky to platí aj pre lookbehind.
+Nech $L$ je ľubovoľný jazyk a $L_p = L \cup \lbrace uv ~|~ u \in L \rbrace$. Nech $\alpha$ je ľubovoľný regulárny výraz taký, že obsahuje $(?=L_p)$. Potom ak prepíšeme tento lookahead na $(?=L)$ (nazvime to $\alpha '$), bude platiť $L(\alpha ') = L(\alpha )$. Analogicky platí pre lookbehind s $L_s=\lbrace vu ~|~ u\in L\rbrace$.
 \end{theorem}
 \begin{proof}
 $\subseteq :$ triviálne,  $L \subseteq L_p$.
@@ -379,7 +381,29 @@ Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neob
 \end{enumerate}
 \end{theorem}
 \begin{proof}
-\TODO
+Pokiaľ $\alpha \in Eregex$, tak pre $\alpha$ platí pumpovacia lema z \cite[Lemma 1]{ExtendedRegexPower}, t.j. $w = a_0ba_1b\dots a_m$ pre nejaké $m$ a $a_0b^ja_1b^j\dots a_m \in L(\alpha)~\forall j$. My pracujeme nad unárnym jazykom, teda na poradí nezáleží: $x=a_0a_1\dots a_m,~y=b^m, k=1$ a $xy^j \in L(\alpha)~\forall j$.
+
+Pokiaľ $\alpha$ neobsahuje spätné referencie, potom podľa vety \ref{re_lalb_in_R} generuje regulárny jazyk a pre ne existuje pumpovacia lema. Podľa nej splníme podmienky tejto vety. Nech $\alpha$ obsahuje aspoň 1 spätnú referenciu.
+
+Definujme teraz konštantu $N$. Dostatočne dlhé slovo je také, kedy s istotou vieme povedať, že aspoň jedna Kleeneho $*$ ($+$) spravila viac ako 1 iteráciu. Nestačí nastaviť $N=|\alpha|$, lebo operácie $\lbrace n \rbrace,\lbrace n,m\rbrace$ a spätné referencie môžu slovo predĺžiť namiesto $*$. Preto nech d je súčet dĺžky regexu v $k$-tych zátvorkách pre všetky $\backslash k$ v $\alpha$,  $n$-krát dĺžky regexov opakovaných $\lbrace n\rbrace$ a $m$-krát dĺžky regexov opakovaných $\lbrace n,m \rbrace$. Potom $N=|\alpha|+d$ je dostatočne veľká konštanta -- predlžovať slovo môže len $*,+$.
+
+Zoberme teraz tú $*$\footnote{$+$ je tiež vlastne $*$}, ktorá iterovala aspoň 2x. Tá generuje nejake $a^s$.
+
+Podľa predošlých úvah $\alpha$ musí obsahovať spätné referencie. Niektoré spätné referencie sa môžu odkazovať na našu vybranú $*$, na tieto spätné referencie sa môžu odkazovať na ďalšie spätné referencie, atď. V konečnom dôsledku je síce $*$ generuje $a^s$, ale dokopy sa generuje $a^{ms} = a^n$. Nazvime tieto miesta, závislé od vybranej $*$, generovacie miesta.
+
+Tiež vieme, že $\alpha$ musí obsahovať nejaký lookaround. Ten môže ovplyvňovať nejaké miesto generovania (prípadne aj viac). Máme 3 prípady interakcie:
+
+1. Žiaden lookaround nezasahuje do generujúcich miest. Nech $w=a^t$, potom $x=a^{t-n},~y=a^n,~k=1$ a $xy^j\in L(\alpha) ~\forall j$.
+
+2. Lookahead bez \$ a/alebo lookbehind bez \textasciicircum ~zasahuje do generujúceho miesta alebo sa môže nachádzať vnútri iterovaniej $*$. Podľa vety \ref{bezprefixove} vieme, že v lookaheade stačí prefixová podmnožina, čo nad unárnou abecedou dáva jazyk s 1 slovom. Toto slovo obmedzuje iterovanie zdola -- slovo v lookaheade určuje minimálnu dĺžku slova od daného miesta. (Podobne pre lookbehind.) $w$ už túto podmienku spĺňa, teda máme generovacie miesta bez obmedzení a to je predošlý prípad.
+
+3. generovacie miesto je v oblasti pôsobenia lookaheadu s \$ a/alebo lookbehindu s \textasciicircum. Takýto lookaround tvorí prienik. Keďže slovo je dostatočne dlhé, musí byť iterujúca $*$ aj v takýchto lookaroundoch.
+
+Rozoberme si prípad $*$ a 1 lookaroundu. $*$ generuje $a^s$, lookaround generuje $a^l$. Lookaround robí prienik jazykov, takže v danom úseku sú dobré len slová tvaru $a^b$, kde $b=j\cdot nsn(s,l)$\footnote{najmenší spoločný násobok}.
+
+Všeobecnejšie, nech máme 1 lookaround a $*$ s niekoľkými spätnými referenciami. Potom sčítame to, čo generujú $*$ so spätnými referenciami -- spolu nejaké $a^r$. Opäť výsledné slovo bude prienik s lookaroundom (ten nech generuje $a^l$), teda $a^b$, kde $b=j\cdot nsn(r,l)$ -- teda násobok najmenšieho spoločného násobku.
+
+Týmto spôsobom vieme spočítať koeficient spoločného generovaného prvku -- postupne sčítavame $*$ a  spätné refrencie a keď sa vyskytne lookaround spravíme najmenší spoločný násobok ich generovaných prvkov. Potom nech $v$ je výsledný koeficient, $x=a^{t-1}, y=a, k=v$ a $xy^{jk}\in L(\alpha)$.
 \end{proof}
 
 \begin{theorem}
