@@ -301,9 +301,9 @@ Pre negatívne formy musíme navyše upraviť akceptáciu. Ak $A_2$ pre lookahea
 \begin{theorem}
 $\L_{CF}$ nie je uzavretá na pozitívny lookaround.
 \end{theorem}
-Vieme totiž vygenerovať jazyk $L=\lbrace a^nb^nc^n|n\in\N\rbrace$ pomocou jazykov $L_1=\lbrace a*b^nc^n|n\in\N\rbrace$ a $L_2=\lbrace a^nb^nc*|n\in\N\rbrace$: $L=\lookahead L_1)L_2 =L_1\lookbehind L_2)$.
+Vieme totiž vygenerovať jazyk $L=\lbrace a^nb^nc^n|n\in\N\rbrace$ pomocou jazykov $L_1=\lbrace a*b^nc^n|n\in\N\rbrace$ a $L_2=\lbrace a^nb^nc*|n\in\N\rbrace$ takto $L=\lookahead L_1)L_2 =L_1\lookbehind L_2)$.
 
-Takýto výsledok bol očakávateľný, pretože lookaround robí uzavretosť na prienik a to trieda bezkontextových jazykov nie je.
+Takýto výsledok bol očakávateľný, pretože lookaround vytvára uzavretosť na prienik a to trieda bezkontextových jazykov nie je.
 
 \begin{theorem}
 $\L_{CS}$ je uzavretá na pozitívny lookaround.
@@ -311,31 +311,33 @@ $\L_{CS}$ je uzavretá na pozitívny lookaround.
 \begin{proof}
 Nech jazyky $L_1,L_2,L_3\in\L_{CS}$, potom ukážeme, že $L_1\lookahead L_2)L_3, ~L_1\lookbehind L_2) L_3 \in\L_{CS}$. Ku každému $L_i$ existuje Turingov stroj $T_i$, ktorý ho akcpetuje. Zostrojíme nedeterministický Turingov stroj $T$ pre lookahead.
 
-$T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstupné slovo $w$ na $w_1,w_2, w_3$ tak, že $w = w_1w_3$ a $w_3=w_2x$ pre nejaké $x$ ($w_1=xw_2$ v prípade lookbehindu). Na jednu pracovnú pásku prepíše $w_1$ a bude simulovať $T_1$. Keď akceptuje, pásku vymaže, zapíše tam $w_2$ a bude simulovať $T_2$. Ak aj ten akceptuje, pásku vymaže, zapíše tam $w_3$ a bude simulovať $T_3$. Ak $T_3$ akceptuje, bude akceptovať aj $T$. Zrejme akceptuje požadovaný jazyk.
+$T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstupné slovo $w$ na $w_1,w_2, w_3$ tak, že $w = w_1w_3$ a $w_3=w_2x$ pre nejaké $x$ ($w_1=xw_2$ v~prípade lookbehindu). Na jednu pracovnú pásku prepíše $w_1$ a bude simulovať $T_1$. Keď akceptuje, pásku vymaže, zapíše tam $w_2$ a bude simulovať $T_2$. Ak aj ten akceptuje, pásku vymaže, zapíše tam $w_3$ a bude simulovať $T_3$. Ak $T_3$ akceptuje, bude akceptovať aj $T$. Zrejme akceptuje požadovaný jazyk.
 \end{proof}
 
 \begin{theorem}\label{re_lalb_in_R}
 Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
 \end{theorem}
 \begin{proof}
-Samotné regexy pokrývajú triedu regulárnych jazykov a tá je na lookaround uzavretá (veta \ref{R_uz_lalb}). Keďže pracujeme s množinou operácií, treba overiť, či nejaká ich kombinácia nie je náhodou silnejšia. Ak regex umiestníme do lookaroundu, či pred alebo za neho, vždy to bude regulárny jazyk a celý regex bude tiež definovať regulárny jazyk. Teda nás zaujíma vloženie lookaroundu dovnútra inej operácie. V tomto prípade prichádza do úvahy $*,+$ a $?$, ktoré menia počet lookaroundov a vynútia ich simuláciu na rôznych častiach slova.
+Trieda jazykov nad $\re$ pokrýva triedu regulárnych jazykov a tá je na lookaround uzavretá (veta \ref{R_uz_lalb}). Keďže pracujeme s množinou operácií, treba overiť, či nejaká ich kombinácia nie je náhodou silnejšia. Ak regex umiestníme do lookaroundu, či pred alebo za neho, vždy to bude regulárny jazyk a celý regex bude tiež definovať regulárny jazyk. Teda nás zaujíma vloženie lookaroundu dovnútra inej operácie. V tomto prípade prichádza do úvahy $*,+$ a $?$, ktoré menia počet lookaroundov a vynútia ich simuláciu na rôznych častiach slova.
 
-$?$ veľa nespraví -- lookaround tam buď bude 1x alebo nebude vôbec. $+$ je prípad $*$ s jedným lookaroundom istým. Teda chceme overiť, že $(L_1 \lookahead L_2) L_3)*L_4,~L_4(L_1 \lookbehind L_2) L_3)* \in \R$. K týmto jazykom vieme zostrojiť konečné automaty podobným spôsobom ako vo vete \ref{R_uz_lalb}. 
+Operácia $?$ veľa nespraví -- lookaround tam buď bude 1x alebo nebude vôbec. $+$ je prípad $*$ s jedným lookaroundom istým. Teda chceme overiť, že $(L_1 \lookahead L_2) L_3)*L_4,~L_4(L_1 \lookbehind L_2) L_3)* \in \R$ pre $L_1,\dots,L_4\in\R$. K týmto jazykom vieme zostrojiť konečné automaty podobným spôsobom ako vo vete \ref{R_uz_lalb}. 
 
-Ku kostre z automatov $A_1,A_3,A_4$ pripojíme $A_2$ pre lookahead tak, že v každej iterácii zároveň s $A_3$ spustíme aj $A_2$, pričom $A_2$ môže skončiť kedykoľvek. Budeme mať množinu stavov $A_2$, čo budú stavy všetkých spustených automatov. Ak v množine má nejaký stav prejsť do akceptačného stavu, ten už nepíšeme. Jediná požiadavka je, aby množina stavov $A_2$ bola po dočítaní slova prázdna.
+Ku kostre z automatov $A_1,A_3,A_4$ pripojíme $A_2$ pre lookahead tak, že v každej iterácii zároveň s $A_3$ spustíme aj $A_2$, pričom $A_2$ môže skončiť kedykoľvek. Budeme mať množinu stavov $A_2$, čo budú stavy všetkých spustených automatov. Ak nejaký stav v množine prejde do akceptačného stavu, ten už nepíšeme. Jediná požiadavka je, aby množina stavov $A_2$ bola po dočítaní slova prázdna.
 
-Automat $A_2$ pre lookbehind ku kostre pripájame tak, že kedykoľvek počas behu sa môže spustiť 1 jeho inštancia. Podmienka je, že ak sme na počiatočnom stave $L_3$, množina stavov $A_2$ musí obsahovať aspoň 1 akceptačný stav. Ten sa potom môžeme rozhodnúť odstrániť alebo nechať, lebo predpokladáme, že je to ďalšia inštacia $A_2$ v rovnakom stave a tá sa vymaže neskôr.
+Automat $A_2$ pre lookbehind ku kostre pripájame tak, že kedykoľvek počas behu sa môže spustiť 1 jeho inštancia. Podmienka je, že ak sme v počiatočnom stave $A_3$, množina stavov $A_2$ musí obsahovať aspoň 1 akceptačný stav. Ten sa potom môžeme rozhodnúť odstrániť alebo nechať, ak predpokladáme, že je to ďalšia inštacia $A_2$ v rovnakom stave taká, že sa vymaže neskôr.
 \end{proof}
 
 
-Nasledujúca veta hovorí, že do lookaheadu stačí dávať z každého jazyka jeho prefixovú podmnožinu\footnote{T.j. z jazyka $L$ stačí $L_p=\lbrace u~|~ u\in L \wedge \nexists v \in L: u = vx \rbrace$.}. Akonáhle lookahead nájde prefix, akceptuje a ku zvyšku slova sa nikdy neprepracuje. Podobne to platí pre lookehind a sufixovú podmnožinu jazyka. 
+Nasledujúca veta hovorí, že do lookaheadu stačí dávať z každého jazyka jeho prefixovú podmnožinu\footnote{T.j. z jazyka $L$ stačí $L_p=\lbrace u~|~ u\in L \wedge \nexists v \in L: u = vx \rbrace$.}. Akonáhle lookahead nájde prefix, akceptuje a ku zvyšku slova sa nikdy neprepracuje. Podobne to platí pre lookehind a sufixovú podmnožinu jazyka.
+
+Samozrejme toto platí pre lookaheady bez \$ a look\-behindy bez \textasciicircum.
 \begin{theorem}\label{bezprefixove}
 Nech $L$ je ľubovoľný jazyk a $L_p = L \cup \lbrace uv ~|~ u \in L \rbrace$. Nech $\alpha$ je ľubovoľný regulárny výraz taký, že obsahuje $(?=L_p)$. Potom ak prepíšeme tento lookahead na $(?=L)$ (nazvime to $\alpha '$), bude platiť $L(\alpha ') = L(\alpha )$. Analogicky platí pre lookbehind s $L_s=\lbrace vu ~|~ u\in L\rbrace$.
 \end{theorem}
 \begin{proof}
 $\subseteq :$ triviálne,  $L \subseteq L_p$.
 
-$\supseteq :$ Majme $w \in L(\alpha)$ a nech $x$ je také podslovo $w$, ktoré sa zhodovalo práve s daným lookaheadom. Potom $x \in L_p$, teda $x=uv$, kde $u \in L$. Ak $v=\varepsilon$, $x \in L$ a máme čo sme chceli. Takže $v\neq \varepsilon$. Ale celá zhoda lookaheadu sa môže zúžiť len na $u$, keďže $u \in L_p$, a bude to platná zhoda s $w$. Čo znamená, že $w \in L(\alpha ')$.
+$\supseteq :$ Majme $w \in L(\alpha)$ a nech $x$ je také podslovo $w$, ktoré sa zhodovalo práve s daným lookaheadom. Potom $x \in L_p$, teda $x=uv$, kde $u \in L$. Ak $v=\varepsilon$, $x \in L$ a máme čo sme chceli. Nech $v\neq \varepsilon$. Ale celá zhoda lookaheadu sa môže zúžiť len na $u$, keďže $u \in L_p$, a bude to platná zhoda s $w$. Čo znamená, že $w \in L(\alpha ')$.
 \end{proof}
 
 \begin{corollary}
@@ -351,7 +353,7 @@ $\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
 \end{theorem}
 \begin{proof}
 
-Všetky $\subseteq$ triviálne platia.
+Všetky $\subseteq$ okrem poslednej triviálne platia. Posledná platí, lebo vieme na lineárne ohraničenom Turingovom stroji T simulovať ľubovoľný regex $\in\nlel$. Opierať sa budeme o formálny model a definíciu \ref{dfkonfig}. Ľavú stranu konfigurácie (regex) bude mať T v stave a pravú stranu aj s poschodovými symbolmi bude simulovať na vstupnej páske. Kroky odvodenia pre negatívny lookaround bude simulovať spustením nového Turingového stroja pre vnútorný regex -- tento Turingov stroj bude mať ohraničený vstup (konkrétne podslovo) a opačnú akceptáciu.\footnote{Regexy majú tú vlastnosť, že vieme pre ne zostrojiť taký Turingov stroj, ktorý sa nezacyklí.} Keďže regex je konečný, T bude spúšťať konečný počet nových Turingových strojov, preto vieme dopredu povedať, koľko stôp na vstupnej páske budeme potrebovať.
 
 $\R \subsetneq \el$: \cite{ExtendedRegexPower}
 
