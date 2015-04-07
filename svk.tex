@@ -314,6 +314,8 @@ Nech jazyky $L_1,L_2,L_3\in\L_{CS}$, potom ukážeme, že $L_1\lookahead L_2)L_3
 $T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstupné slovo $w$ na $w_1,w_2, w_3$ tak, že $w = w_1w_3$ a $w_3=w_2x$ pre nejaké $x$ ($w_1=xw_2$ v~prípade lookbehindu). Na jednu pracovnú pásku prepíše $w_1$ a bude simulovať $T_1$. Keď akceptuje, pásku vymaže, zapíše tam $w_2$ a bude simulovať $T_2$. Ak aj ten akceptuje, pásku vymaže, zapíše tam $w_3$ a bude simulovať $T_3$. Ak $T_3$ akceptuje, bude akceptovať aj $T$. Zrejme akceptuje požadovaný jazyk.
 \end{proof}
 
+Teraz zistíme, čo robí lookaround s regexami (zatiaľ bez spätných referencií) a napíšeme nejaké jeho vlastnosti.
+
 \begin{theorem}\label{re_lalb_in_R}
 Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
 \end{theorem}
@@ -348,6 +350,7 @@ Uvedomme si, že lookaround nie je fixovaný na dĺžku vstupu - musí sa zhodov
 \end{proof}
 
 \section{Chomského hierarchia}
+Zaradíme zadefinované triedy do Chomského hierarchie.
 \begin{theorem}
 $\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
 \end{theorem}
@@ -366,6 +369,8 @@ $\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s 
 Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aaa*)\backslash 1(\backslash 1)* \$~)$, kde $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$. Avšak na dokázanie $L(\alpha)\notin\lel$ zatiaľ nemáme šikovné prostriedky a preto to zostáva netriviálnym otvoreným problémom.
 
 \section{Vlastnosti triedy $\lel$}
+
+Keďže sa ukázalo, že množina $\le$ je silnejšia ako skúmaná $\el$, intenzívnejšie sme sa povenovali jej vlastnostiam.
 
 Očividne operácia lookahead/lookbehind pridala uzavretosť na prienik. Nech $\alpha,\beta\in\le$, potom $L(\alpha)\cap L(\beta) = L(\gamma)$, kde $\gamma = \lookahead \alpha \$)\beta$ alebo $\beta \lookbehind ~\textasciicircum \alpha)$.
 
@@ -395,6 +400,8 @@ Zrejme $L(\gamma)=L(\alpha)L(\beta)$.
 \end{proof}
 
 Otvoreným problémom je, či platí aj uzavretosť na $*$. Podľa komplikovanosti zreťazenia sa domnievame, že uzavretosť neplatí.
+
+Pre model $\el$ existuje pumpovacia lema. Ukázalo sa, že $\le$ túto vlastnosť nezachováva.
 
 \begin{theorem}
 Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$, že neobsahuje lookahead s $\mathdollar$ ani lookbehind s $\textasciicircum$ vnútri iterácie. Existuje konštanta $N$ taká, že ak $w \in L(\alpha)$ a $\vert w \vert > N$, potom existuje dekompozícia $w=xy$ s nasledujúcimi vlastnosťami:
@@ -428,6 +435,17 @@ Všeobecnejšie, nech máme 1 lookaround a $*$ s niekoľkými spätnými referen
 
 Týmto spôsobom vieme spočítať koeficient spoločného generovaného prvku -- postupne sčítavame $*$ a  spätné refrencie a keď sa vyskytne lookaround spravíme najmenší spoločný násobok ich generovaných prvkov. Potom nech $v$ je výsledný koeficient, $x=a^{t-1}, y=a, k=v$ a platí $xy^{jk}\in L(\alpha)$.
 \end{proof}
+
+Podmienka ,,neobsahuje lookahead s \$ ani lookbehind s \textasciicircum vnútri iterácie'' je opodstatnená. Takáto kombinácia je vôbec ťažko predstaviteľná a preto sa pre ňu ťažko dokazujú tvrdenia. Napríklad regex
+$$(\lookahead \underbrace{
+ \underbrace{ \lookahead (a^m)*\$ )}_{a^{km},~ k\in\N} 
+ \underbrace{(a^{m+1})* a\lbrace 1,m-1\rbrace \$ ~|~ a^m \$ }_{\text{vie } a* \text{ okrem } a^{m+1},~a^{m(m+1)l},~ l\in\N} 
+ }_{a^{km} \text{ také, že nevie } a^{m(m+1)l}, ~l\in\N }
+  ) a^m)+$$
+generuje konečný jazyk obsahujúci slová $a^m,\allowbreak a^{2m},\dots,\allowbreak a^{(m-1)(m+1)}$. Hlavný lookahead je spúšťaný každú iteráciu, teda pre slovo $a^{zm}$ musí matchovať všetky $a^{im}$ pre $i\in\lbrace 1,\dots,z\rbrace$.
+
+A teraz dôkaz, že všeobecná pumpovacia lema určite neexistuje:
+
 
 \begin{theorem}
 Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
