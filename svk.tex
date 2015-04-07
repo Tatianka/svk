@@ -308,6 +308,22 @@ Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentn
 \end{theorem}
 \TODO
 
+\begin{theorem}\label{bezprefixove}
+Nech $L$ je ľubovoľný jazyk a $L_p = L \cup \lbrace uv ~|~ u \in L \rbrace$. Nech $\alpha$ je ľubovoľný regulárny výraz taký, že obsahuje $(?=L_p)$. Potom ak prepíšeme tento lookahead na $(?=L)$ (nazvime to $\alpha '$), bude platiť $L(\alpha ') = L(\alpha )$. Analogicky to platí aj pre lookbehind.
+\end{theorem}
+\begin{proof}
+$\subseteq :$ triviálne,  $L \subseteq L_p$.
+
+$\supseteq :$ Majme $w \in L(\alpha)$ a nech $x$ je také podslovo $w$, ktoré sa zhodovalo práve s daným lookaheadom. Potom $x \in L_p$, teda $x=uv$, kde $u \in L$. Ak $v=\varepsilon$, $x \in L$ a máme čo sme chceli. Takže $v\neq \varepsilon$. Ale celá zhoda lookaheadu sa môže zúžiť len na $u$, keďže $u \in L_p$, a bude to platná zhoda s $w$. Čo znamená, že $w \in L(\alpha ')$.
+\end{proof}
+
+\begin{corollary}
+Nech $\alpha$ je regulárny výraz, ktorý obsahuje nejaký taký lookahead $(?=L)$ (lookbehind $(?<=L)$), že $\varepsilon \in L$. Nech je $\alpha '$ regulárny výraz bez tohto lookaheadu (lookbehindu). Potom $L(\alpha ') = L(\alpha)$.
+\end{corollary}
+\begin{proof}
+Uvedomme si, že lookaround nie je fixovaný na dĺžku vstupu - musí sa zhodovať s nejakým podslovom začínajúcim sa (končiacim sa) na konkrétnom mieste. Tým pádom akonáhle si môže regulárny výraz vnútri tejto operácie vybrať $\varepsilon$, bude hlásiť zhodu vždy.
+\end{proof}
+
 \section{Chomského hierarchia}
 \begin{theorem}
 $\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
@@ -324,7 +340,7 @@ $\alpha=\displaystyle{\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a 
 $\lel,\nlel \subsetneq \L_{CS}$: Triedy $\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$. K jazyku $L_1=\lbrace ww~|~w\in \lbrace a,b \rbrace^*\rbrace \notin \L_{CF}$ existuje regex z $\le$: $\alpha= ((a|b)*)\backslash 1$. Ani jedna z tried neobsahuje jazyk $L_2=\lbrace a^nb^n|n\in\N\rbrace \in \L_{CF}$.
 \end{proof}
 
-Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aa+)(\backslash 1)+ \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$. Avšak na dokázanie $L(\alpha)\notin\lel$ zatiaľ nemáme šikovné prostriedky a preto to zostáva netriviálnym otvoreným problémom.
+Intuitívne by malo platiť aj $\lel \subsetneq \nlel$, pretože negatívny lookaround pridáva uzavretosť na komplement. Jazyk dokazujúci nerovnosť by mohol byť napríklad regex $\alpha =\nlookahead ~(aaa*)\backslash 1(\backslash 1)* \$~)$, pričom $L(\alpha)= \lbrace a^p ~|~ p \text{ je prvočíslo} \rbrace$. Avšak na dokázanie $L(\alpha)\notin\lel$ zatiaľ nemáme šikovné prostriedky a preto to zostáva netriviálnym otvoreným problémom.
 
 \section{Vlastnosti triedy $\lel$}
 
