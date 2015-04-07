@@ -274,7 +274,7 @@ Späť k akceptačnému výpočtu. Nech sú všetky akceptačné výpočty dlhš
 
 \section{Vlastnosti lookaroundu}
 Na zoznámenie s novou operáciou sme skúsili zistiť uzavretosť tried Chomského hierarchie.
-\begin{theorem}
+\begin{theorem}\label{R_uz_lalb}
 $\R$ je uzavretá na negatívny a pozitívny lookaround.
 \end{theorem}
 \begin{proof}
@@ -306,7 +306,15 @@ $T$ bude mať vstupnú read--only pásku. $T$ si nedeterministicky rozdelí vstu
 \begin{theorem}\label{re_lalb_in_R}
 Trieda jazykov nad $\re$ s pozitívnym a negatívnym lookaroundom je ekvivalentná $\R$.
 \end{theorem}
-\TODO
+\begin{proof}
+Samotné regexy pokrývajú triedu regulárnych jazykov a tá je na lookaround uzavretá (veta \ref{R_uz_lalb}). Keďže pracujeme s množinou operácií, treba overiť, či nejaká ich kombinácia nie je náhodou silnejšia. Ak regex umiestníme do lookaroundu, či pred alebo za neho, vždy to bude regulárny jazyk a celý regex bude tiež definovať regulárny jazyk. Teda nás zaujíma vloženie lookaroundu dovnútra inej operácie. V tomto prípade prichádza do úvahy $*,+$ a $?$, ktoré menia počet lookaroundov a vynútia ich simuláciu na rôznych častiach slova.
+
+$?$ veľa nespraví -- lookaround tam buď bude 1x alebo nebude vôbec. $+$ je prípad $*$ s jedným lookaroundom istým. Teda chceme overiť, že $(L_1 \lookahead L_2) L_3)*L_4,~L_4(L_1 \lookbehind L_2) L_3)* \in \R$. K týmto jazykom vieme zostrojiť konečné automaty podobným spôsobom ako vo vete \ref{R_uz_lalb}. 
+
+Ku kostre z automatov $A_1,A_3,A_4$ pripojíme $A_2$ pre lookahead tak, že v každej iterácii zároveň s $A_3$ spustíme aj $A_2$, pričom $A_2$ môže skončiť kedykoľvek. Budeme mať množinu stavov $A_2$, čo budú stavy všetkých spustených automatov. Ak v množine má nejaký stav prejsť do akceptačného stavu, ten už nepíšeme. Jediná požiadavka je, aby množina stavov $A_2$ bola po dočítaní slova prázdna.
+
+Automat $A_2$ pre lookbehind ku kostre pripájame tak, že kedykoľvek počas behu sa môže spustiť 1 jeho inštancia. Podmienka je, že ak sme na počiatočnom stave $L_3$, množina stavov $A_2$ musí obsahovať aspoň 1 akceptačný stav. Ten sa potom môžeme rozhodnúť odstrániť alebo nechať, lebo predpokladáme, že je to ďalšia inštacia $A_2$ v rovnakom stave a tá sa vymaže neskôr.
+\end{proof}
 
 
 Nasledujúca veta hovorí, že do lookaheadu stačí dávať z každého jazyka jeho prefixovú podmnožinu\footnote{T.j. z jazyka $L$ stačí $L_p=\lbrace u~|~ u\in L \wedge \nexists v \in L: u = vx \rbrace$.}. Akonáhle lookahead nájde prefix, akceptuje a ku zvyšku slova sa nikdy neprepracuje. Podobne to platí pre lookehind a sufixovú podmnožinu jazyka. 
