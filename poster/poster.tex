@@ -1,0 +1,209 @@
+% !Mode:: "TeX::UTF-8"
+\documentclass[myposter,portrait,plainboxedsections]{sciposter}
+
+%% uzitocne package
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+%% znaky s diakritikou
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fontenc}
+\usepackage[slovak]{babel} % slovenske delenie slov
+
+% matika
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{lmodern}
+\usepackage{bm} %pisat boldom v math-mode
+
+% Vennove diagramy
+\usepackage{tikz}
+\usetikzlibrary{shapes,positioning,fit}
+
+%% definicia farieb
+\definecolor{mainCol}{rgb}{0.98,1,0.89} % farba pozadia posteru
+\definecolor{sectionCol}{rgb}{1,1,0} % farba ramceka boxov
+\definecolor{textCol}{rgb}{0,0,0} % farba nadpisu 
+\definecolor{BoxCol}{rgb}{1,1,0.2} % farba boxu okolo nadpisov
+
+% silna zlta
+\definecolor{cadmiumyellow}{rgb}{1.0, 0.96, 0.0}
+\definecolor{electricyellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{laserlemon}{rgb}{1.0, 1.0, 0.13}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+% slaba zlta
+\definecolor{icterine}{rgb}{0.99, 0.97, 0.37}
+\definecolor{unmellowyellow}{rgb}{1.0, 1.0, 0.4}
+
+\definecolor{lemonchiffon}{rgb}{1.0, 0.98, 0.8}
+\definecolor{lightgoldenrodyellow}{rgb}{0.98, 0.98, 0.82}
+\definecolor{lightyellow}{rgb}{1.0, 1.0, 0.88}
+\definecolor{pastelyellow}{rgb}{0.99, 0.99, 0.59}
+
+\def\R{{\cal R}} % znak pre regulárne jazyky
+\def\L{\mathscr{L}} % zvyšné triedy jazykov
+\def\P{{\cal P}} % potenčná množina
+\def\N{\mathds{N}} %prirodzene cisla
+\def\re{Regex}
+\def\e{Eregex}
+\def\le{LEregex}
+\def\nle{nLEregex}
+\def\rel{{\mathscr{L}_{RE}}}
+\def\el{\mathscr{L}_{ERE}}
+\def\lel{\mathscr{L}_{LERE}}
+\def\nlel{\mathscr{L}_{nLERE}}
+\def\lookahead{\text{(?=}}
+\def\nlookahead{\text{(?!~}}
+\def\lookbehind{\text{(?\textless =}}
+\def\nlookbehind{\text{(?\textless !~}}
+
+\def\mysection#1{
+{\color{sectionCol}\section*{\sc\bfseries #1}}}
+
+\begin{document}
+\setlength{\logowidth}{20cm}
+\setlength{\titlewidth}{\textwidth}
+\addtolength{\titlewidth}{-\logowidth}
+\rightlogo[0.9]{fmfilogo-farebne}
+\useleftlogofalse
+
+\color{textCol}
+
+\title{Moderné regulárne jazyky}
+\author{Tatiana Tóthová\\
+        Školiteľ: RNDr. Michal Forišek PhD.}
+\institute{%
+Katedra informatiky,
+FMFI UK, Mlynská Dolina, 842~48~Bratislava
+}
+\maketitle
+
+\begin{multicols*}{3}
+
+\mysection{Úvod}
+
+Regulárne výrazy vznikli v 60tych rokoch v teórii jazykov ako ďalší model na vyjadrenie regulárnych jazykov. Z ich popisu ľudský mozog rýchlejšie pochopil o aký jazyk sa jedná, než zo zápisu konečného automatu, či regulárnej gramatiky. Ďalšou výhodou bol kratší a kompaktný zápis.
+
+Vďaka týmto vlastnostiam boli implementované ako vyhľadávací nástroj. Postupom času sa iniciatívou používateľov s vyššími nárokmi pridávali nové konštrukcie na uľahčenie práce. Nástroj takto rozvíjali až do dnešnej podoby. My sa budeme opierať o špecifikáciu regulárnych výrazov v jazyku Python \cite{Python3Documentation}.
+
+Ako čoskoro zistíme, nové regulárne výrazy vedia reprezentovať zložitejšie jazyky ako regulárne, preto je dobré ich nejako odlíšiť. V literatúre sa zaužíval výraz ,,regex'' z anglického \textit{regular expression}, ktorý budeme používať aj my.
+
+\mysection{Definícia moderných regulárnych jazykov}
+
+\underline{Základné regulárne výrazy} sa skladajú zo znakov a metaznakov. Znak je regulárny výraz predstavujúci sám seba. Metaznak (alebo skupina metaznakov) určuje, čo sa s regulárnym výrazom udeje. Základný model obsahuje operácie
+\begin{itemize}
+\item \textbf{zreťazenie} ($\alpha\beta$)
+\item \textbf{alternácia} ($\alpha|\beta$) 
+\item \textbf{Kleeneho uzáver} ($\alpha*$ = opakuj $\alpha$ $(0-\infty)$-krát)
+\end{itemize}
+Okrem toho používame \textbf{zátvorky ()} na špecifikovanie poľa pôsobnosti operácií. Každý regex je zložený z konečného počtu operácií.
+\\ \\
+\underline{Moderné regulárne výrazy}, nazývané aj \underline{regexy}, majú navyše metaznak pre ľubovoľný znak . , začiatok slova \textasciicircum ~a koniec slova \$. Bolo zavedené číslovanie zátvoriek -- zľava doprava podľa otváracej zátvorky a konštrukcie tvaru $(?\dots)$ sa nečíslujú. Pribudli aj nasledujúce zložitejšie konštrukcie:
+
+\begin{itemize}
+
+%% Spätné referencie
+\item \textbf{Spätné referencie} ($\backslash k$) sa odkazujú na $k$-te zátvorky (môže sa nachádzať až za nimi). Pri matchovaní slova si zapamätáme, aké podslovo matchovali $k$-te zátvorky a toto podslovo predstavuje konštrukcia $\backslash k$. Napr. pre regex
+ $\displaystyle \alpha~ \mathop(_k ~\beta ~\mathop)_k ~\gamma ~\backslash k ~\delta$ by výpočet na slove $w$ vyzeral takto:
+
+$$w = \underbrace{x_1\dots x_{i-1}}_\alpha 
+ \overbrace{\underbrace{x_i\dots x_{j-1}}_{ \displaystyle{\mathop(_k\beta \mathop)_k}}}^{w_k} 
+ \underbrace{x_j\dots x_{l-1}}_\gamma 
+ \overbrace{\underbrace{x_l\dots x_{m-1}}_{\backslash k}}^{w_k}
+ \underbrace{x_{m}\dots x_{n}}_\delta$$
+a musí platiť: $w_k= x_i\dots x_{j-1} = x_l\dots x_{m-1} $. Ak existuje viac podslov ku $k$-tym zátvorkám, berie sa vždy to posledné.
+
+%% Lookaround
+\item \textbf{Lookahead} (nazeranie dopredu $\lookahead\dots)$) musí matchovať nejaký prefix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?=\beta)\gamma$ máme:
+ $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\overbrace{x_i \dots x_j}^\beta x_{j+1} \dots x_n }_\gamma$$ 
+
+\item \textbf{Lookbehind} (nazeranie dozadu $\lookbehind\dots)$) musí matchovať nejaký sufix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?<=\beta)\gamma$ máme:
+
+$$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
+
+\item Operácie lookahead a lookbehind majú aj \textbf{negatívne} verzie, kde regex vnútri konštrukcie nesmie matchovať žiaden prefix/sufix.
+
+\end{itemize}
+Pre lookahead a lookbehind sa zaužíval spoločný názov \textbf{lookaround}.
+\\ \\
+\underline{Zaviedli sme nasledujúce množiny operácií:}
+
+\begin{tabular}{lll}
+$\re$ ~& základné operácie &~ $\rel = \R$ \\
+$\e$ ~& + spätné referencie &~ $\el$ \\
+$\le$ ~& + lookahead, lookbehind &~ $\lel$ \\
+$\nle$ ~& + negatívny lookahead, negatívny lookbehind &~ $\nlel$
+\end{tabular}
+
+\mysection{Formálny model} 
+Moderné regulárne výrazy obsahujú množstvo operácií, ktoré spolu rôzne interagujú. Preto sme vytvorili formálny model, ktorý postupuje po krokoch podobne ako Turingov stroj. \textbf{Konfigurácia} pre regex $\alpha=r_1\dots r_n$ a slovo $w=w_1\dots w_m$ je definovaná ($\lceil$ ukazuje pracovnú pozíciu):
+$$(r_1\dots \lceil r_i \dots r_n, w_1 \dots \lceil w_j \dots w_m)$$
+V symboly v slove majú niekoľko poschodí, do ktorých si zapamätáme pomocnú informáciu v \textbf{kroku výpočtu}: ...
+
+
+
+\mysection{Vlastnosti lookaheadu a lookbehindu}
+
+Trieda $\R$ je uzavretá na negatívny aj pozitívny lookaround. Aj trieda $\re$ s lookaroundom stále pokrýva iba regulárne jazyky -- takúto kombináciu operácií totiž vieme simulovať konečnými automatmi. Z výsledkov hierarchie tried však vyplýva nasledovné:
+
+$$ \L \begin{pmatrix}
+\re \\
+\text{+lookahead} \\
+\text{+lookbehind}
+\end{pmatrix} 
+\subsetneq
+\L \begin{pmatrix}
+\re \\
+\text{+spätné referencie}
+\end{pmatrix} 
+\subsetneq
+\L \begin{pmatrix}
+\re \\
+\text{+spätné referencie} \\
+\text{+lookahead,lookbehind}
+\end{pmatrix} 
+$$
+
+To znamená, že lookaround je síce sám slabá operácia, ale v kombinácii so spätnými referenciami máme silnejší model ako bez lookaroundu. A teda má zmysel vsímať si túto operáciu.
+\\ \\ 
+Čo sa týka \underline{uzáverových vlastností}, pozitívny lookaround pridáva uzavretosť na \textbf{prienik} $L(\alpha)\cap L(\beta) = L(~\lookahead\alpha\$)\beta~)$ a negatívny lookaround pridáva uzavretosť na \textbf{komplement} $L(\alpha)^c = L(~ \nlookahead \alpha \$).* ~)$. Avšak ohrozená je základná operácia regulárnych výrazov -- \textbf{zreťazenie}. Trieda $\lel$ však na zreťazenie uzavretá je, $L(\alpha)L(\beta)$ vyjadríme regexom:
+$$
+\lookahead \mathop(_1 \alpha \mathop)_1 \mathop(_{k+2}\beta \mathop)_{k+2} \mathdollar) ~\alpha ' \backslash k\text{+2}~ \lookbehind ~\textasciicircum\backslash 1~\beta ')
+$$
+Prvý lookahead rozdelí vstupné slovo $w$ na $w_1,w_2,~w=w_1w_2$. $\alpha'$ je regex $\alpha$ upravený tak, že jeho lookaheady na konci matchujú $w_2$ a $\beta'$ má upravené lookbehindy tak, že na začiatku matchujú $w_1$. \cite{mojaBak}
+ 
+\mysection{Chomského hierarchia}
+Triviálne platí, že v definovaných triedach je predchádzajúca podmnožinou nasledujúcej.
+$$\R \mathop{\subsetneq}^{(1)} \el \mathop{\subsetneq}^{(2)} \lel \mathop{\subseteq}^{(3)} \nlel \mathop{\subsetneq}^{(4)} \L_{CS}$$
+Teraz uvedieme jazyky, ktoré dokazujú nerovnosť množín. Zároveň to považujeme za malú ukážku toho, čo moderné regulárne výrazy dokážu.
+
+(1) jazyk $L(\alpha) = \lbrace ww|w \in\lbrace a,b \rbrace^* \rbrace \in \L_{CS}$:~~~ $\alpha = (a|b)*\backslash 1$
+\\ \\
+(2) jazyk $L(\beta)=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ ,kde } k'>0,i>0\rbrace \in \lel$: 
+$$\beta=\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b~ \lookahead (\backslash 1) *\$ ) (\backslash 2)* $$
+\\ 
+(3) nerovnosť je otvoreným problémom. Dobrým kandidátom na jej ukázanie je jazyk $L(\gamma) = \lbrace a^z | z \text{ je zložené číslo} \rbrace$, ~~$\gamma = (aaa*)\backslash 1(\backslash 1)*$ a jeho komplement, obsahujúci $a^p$, kde $p$ je prvočíslo: ~~$\nlookahead \gamma\$).*$
+
+
+\mysection{Priestorová zložitosť}
+
+\mysection{Pojmy a skratky}
+$\L(\dots)$ -- trieda jazykov nad \dots
+$\R$ -- trieda regulárnych jazykov
+\\ $\L_{CF}$ -- trieda bezkontextových jazykov
+\\ $\L_{CS}$ -- trieda kontextovných jazykov
+
+%% zoznam literatury
+\bibliographystyle{apalike}
+\nocite{*}
+\bibliography{references}
+
+\end{multicols*}
+\end{document}
+
