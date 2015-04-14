@@ -123,7 +123,7 @@ a musí platiť: $w_k= x_i\dots x_{j-1} = x_l\dots x_{m-1} $. Ak existuje viac p
 \item \textbf{Lookahead} (nazeranie dopredu $\lookahead\dots)$) musí matchovať nejaký prefix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?=\beta)\gamma$ máme:
  $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\overbrace{x_i \dots x_j}^\beta x_{j+1} \dots x_n }_\gamma$$ 
 
-\item \textbf{Lookbehind} (nazeranie dozadu $\lookbehind\dots)$) musí matchovať nejaký sufix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?<=\beta)\gamma$ máme:
+\item \textbf{Lookbehind} (nazeranie dozadu $\lookbehind\dots)$) musí matchovať nejaký sufix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?<=\beta)\gamma$:
 
 $$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
 
@@ -144,7 +144,7 @@ $\nle$ ~& + negatívny lookahead, negatívny lookbehind &~ $\nlel$
 \mysection{Formálny model} 
 Moderné regulárne výrazy obsahujú množstvo operácií, ktoré spolu rôzne interagujú. Preto sme vytvorili formálny model, ktorý postupuje po krokoch podobne ako Turingov stroj. \textbf{Konfigurácia} pre regex $\alpha=r_1\dots r_n$ a slovo $w=w_1\dots w_m$ je definovaná ($\lceil$ ukazuje pracovnú pozíciu):
 $$(r_1\dots \lceil r_i \dots r_n, w_1 \dots \lceil w_j \dots w_m)$$
-V symboly v slove majú niekoľko poschodí, do ktorých si zapamätáme pomocnú informáciu počas výpočtu. \textbf{Krok výpočtu} je definovaný:
+V symboly v slove majú niekoľko poschodí, do ktorých si zapamätáme pomocnú informáciu počas výpočtu. Ochutnávka \textbf{kroku výpočtu}:
  $$\displaystyle (r_1 \dots \lceil ( \dots r_n, w_1 \dots \lceil w_j \dots w_m) \vdash (r_1 \dots (\lceil \dots r_n, w_1 \dots \lceil \mathop{w_j}^k \dots w_m)$$
 Celú definíciu nájdete v \cite{mojaDip}.
 
@@ -179,13 +179,13 @@ $$
 Prvý lookahead rozdelí vstupné slovo $w$ na $w_1,w_2,~w=w_1w_2$. $\alpha'$ je regex $\alpha$ upravený tak, že jeho lookaheady na konci matchujú $w_2$ a $\beta'$ má upravené lookbehindy tak, že na začiatku matchujú $w_1$. \cite{mojaBak}
  
 \mysection{Chomského hierarchia}
-Triviálne platí, že v definovaných triedach je predchádzajúca podmnožinou nasledujúcej.
+Triviálne platí, že v definovaných triedach je predchádzajúca množina podmnožinou nasledujúcej.
 $$\R \mathop{\subsetneq}^{(1)} \el \mathop{\subsetneq}^{(2)} \lel \mathop{\subseteq}^{(3)} \nlel \mathop{\subsetneq}^{(4)} \L_{CS}$$
 Teraz uvedieme jazyky, ktoré dokazujú nerovnosť množín. Zároveň to považujeme za malú ukážku toho, čo moderné regulárne výrazy dokážu.
 
 (1) jazyk $L(\alpha) = \lbrace ww|w \in\lbrace a,b \rbrace^* \rbrace \in \L_{CS}$:~~~ $\alpha = (a|b)*\backslash 1$
 \\ \\
-(2) jazyk $L(\beta)=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ ,kde } k'>0,i>0\rbrace \in \lel$: 
+(2) jazyk $L(\beta)=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ ,kde } k'>0,i>0\rbrace \in \lel$, $\notin \el$ podľa pumpovacej lemy \cite{ExtendedRegexPower}
 $$\beta=\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b~ \lookahead (\backslash 1) *\$ ) (\backslash 2)* $$
 \\ 
 (3) nerovnosť je otvoreným problémom. Dobrým kandidátom na jej ukázanie sú jazyky:
@@ -209,7 +209,6 @@ Myšlienka dôkazu Savitchovej vety spočíva v tom, že testujeme, či sa vieme
 $$\nlel \subseteq DSPACE(\log^2 n)$$
 
 V praxi je bežné, že užívateľ zadáva \underline{na vstup regex aj text na vyhľadávanie}, preto sme si zadefinovali jazyk $L_U$, ktorý akceptuje slová tvaru $regex\#word$, kde $regex\in U$, $regex$ matchuje slovo $word$ a $U$ je množina operácií.
-
 $$L_{\le} \in NSPACE(n \log n)$$
 
 Nech $U$ je $\e$ alebo $\le$ s konečným počtom vnorení look\-aroundov, potom:
@@ -217,8 +216,7 @@ $$L_{U} \in DSPACE(n\log ^2 n)$$
 
 \mysection{Pojmy a skratky}
 $\L(\dots)$ -- trieda jazykov nad \dots
-$\R$ -- trieda regulárnych jazykov
-\\ $\L_{CF}$ -- trieda bezkontextových jazykov
+\\ $\R$ -- trieda regulárnych jazykov ~~ $\L_{CF}$ -- trieda bezkontextových jazykov
 \\ $\L_{CS}$ -- trieda kontextovných jazykov
 
 %% zoznam literatury
