@@ -120,19 +120,19 @@ $$w = \underbrace{x_1\dots x_{i-1}}_\alpha
 a musí platiť: $w_k= x_i\dots x_{j-1} = x_l\dots x_{m-1} $. Ak existuje viac podslov ku $k$-tym zátvorkám, berie sa vždy to posledné.
 
 %% Lookaround
-\item \textbf{Lookahead} (nazeranie dopredu $\lookahead\dots)$) musí matchovať nejaký prefix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?=\beta)\gamma$ máme:
+\item \textbf{Lookahead} (nazeranie dopredu $\lookahead\dots)$) musí matchovať nejaký prefix od aktuálneho pracovného miesta. Napr. pre regex $\alpha\lookahead\beta)\gamma$ máme:
  $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\overbrace{x_i \dots x_j}^\beta x_{j+1} \dots x_n }_\gamma$$ 
 
-\item \textbf{Lookbehind} (nazeranie dozadu $\lookbehind\dots)$) musí matchovať nejaký sufix od aktuálneho pracovného miesta. Napr. pre regex $\alpha(?<=\beta)\gamma$:
+\item \textbf{Lookbehind} (nazeranie dozadu $\lookbehind\dots)$) musí matchovať nejaký sufix od aktuálneho pracovného miesta. Napr. pre regex $\alpha\lookbehind\beta)\gamma$:
 
 $$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
 
-\item Operácie lookahead a lookbehind majú aj \textbf{negatívne} verzie, kde regex vnútri konštrukcie nesmie matchovať žiaden prefix/sufix.
+\item Operácie lookahead a lookbehind majú aj \textbf{negatívne} verzie (pridáva sa~!), kde regex vnútri konštrukcie nesmie matchovať žiaden prefix/sufix.
 
 \end{itemize}
 Pre lookahead a lookbehind sa zaužíval spoločný názov \textbf{lookaround}.
 \\ \\
-\underline{Zaviedli sme nasledujúce množiny operácií:}
+\underline{Zaviedli sme nasledujúce triedy regexov nad množinami operácií:}
 
 \begin{tabular}{lll}
 $\re$ ~& základné operácie &~ $\rel = \R$ \\
@@ -170,7 +170,7 @@ $$ \L \begin{pmatrix}
 \end{pmatrix} 
 $$
 
-To znamená, že lookaround je síce sám slabá operácia, ale v kombinácii so spätnými referenciami máme silnejší model ako bez lookaroundu. A teda má zmysel vsímať si túto operáciu.
+To znamená, že lookaround je síce sám slabá operácia, ale v kombinácii so spätnými referenciami máme silnejší model ako bez lookaroundu. A teda má zmysel všímať si túto operáciu.
 \\ \\ 
 Čo sa týka \underline{uzáverových vlastností}, pozitívny lookaround pridáva uzavretosť na \textbf{prienik} $L(\alpha)\cap L(\beta) = L(~\lookahead\alpha\$)\beta~)$ a negatívny lookaround pridáva uzavretosť na \textbf{komplement} $L(\alpha)^c = L(~ \nlookahead \alpha \$).* ~)$. Avšak ohrozená je základná operácia regulárnych výrazov -- \textbf{zreťazenie}. Trieda $\lel$ však na zreťazenie uzavretá je, $L(\alpha)L(\beta)$ vyjadríme regexom:
 $$
@@ -185,7 +185,7 @@ Teraz uvedieme jazyky, ktoré dokazujú nerovnosť množín. Zároveň to považ
 
 (1) jazyk $L(\alpha) = \lbrace ww|w \in\lbrace a,b \rbrace^* \rbrace \in \L_{CS}$:~~~ $\alpha = (a|b)*\backslash 1$
 \\ \\
-(2) jazyk $L(\beta)=\lbrace a^iba^{i+1}ba^ik ~|~ k=i(i+1)k' \text{ ,kde } k'>0,i>0\rbrace \in \lel$, $\notin \el$ podľa pumpovacej lemy \cite{ExtendedRegexPower}
+(2) jazyk $L(\beta)=\lbrace a^iba^{i+1}ba^{ik} ~|~ k=i(i+1)k' \text{ ,kde } k'>0,i>0\rbrace \in \lel$, $\notin \el$ podľa pumpovacej lemy \cite{ExtendedRegexPower}
 $$\beta=\mathop{(}_1 a*\mathop{)}_1 b \mathop{(}_2 \backslash 1 a \mathop{)}_2 b~ \lookahead (\backslash 1) *\$ ) (\backslash 2)* $$
 \\ 
 (3) nerovnosť je otvoreným problémom. Dobrým kandidátom na jej ukázanie sú jazyky:
@@ -205,7 +205,7 @@ $$\lel \subseteq NSPACE(\log n)$$
 Zo Savitchovej vety vyplýva:
 $\lel \subseteq DSPACE(\log^2 n)$
 
-Myšlienka dôkazu Savitchovej vety spočíva v tom, že testujeme, či sa vieme dostať z jednej konfigurácie do druhej na istý počet krokov. Formálny model má definované konfigurácie,ktoré sme využili a dokázali tak výsledok aj pre negatívny lookaround:
+Myšlienka dôkazu Savitchovej vety spočíva v tom, že testujeme, či sa vieme dostať z jednej konfigurácie do druhej na istý počet krokov. Formálny model má definované konfigurácie, ktoré sme využili a dokázali tak výsledok aj pre negatívny lookaround:
 $$\nlel \subseteq DSPACE(\log^2 n)$$
 
 V praxi je bežné, že užívateľ zadáva \underline{na vstup regex aj text na vyhľadávanie}, preto sme si zadefinovali jazyk $L_U$, ktorý akceptuje slová tvaru $regex\#word$, kde $regex\in U$, $regex$ matchuje slovo $word$ a $U$ je množina operácií.
@@ -215,7 +215,7 @@ Nech $U$ je $\e$ alebo $\le$ s konečným počtom vnorení look\-aroundov, potom
 $$L_{U} \in DSPACE(n\log ^2 n)$$
 
 \mysection{Pojmy a skratky}
-$\L(\dots)$ -- trieda jazykov nad \dots
+$\L(\dots)$ -- trieda jazykov nad \dots~(nejaký model)
 \\ $\R$ -- trieda regulárnych jazykov ~~ $\L_{CF}$ -- trieda bezkontextových jazykov
 \\ $\L_{CS}$ -- trieda kontextovných jazykov
 
