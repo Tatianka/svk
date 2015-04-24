@@ -1,0 +1,261 @@
+\documentclass[mathserif]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[slovak]{babel}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{fontenc}
+\usepackage{bm} %pisat boldom v math-mode
+\usepackage{multirow}
+
+\usetheme{Warsaw}
+\usecolortheme{wolverine}
+\setbeamercolor{block body alerted}{bg=yellow}
+
+\def\R{{\cal R}} % znak pre regulárne jazyky
+\def\L{\mathscr{L}} % zvyšné triedy jazykov
+\def\P{{\cal P}} % potenčná množina
+\def\N{\mathds{N}} %prirodzene cisla
+\def\re{Regex}
+\def\e{Eregex}
+\def\le{LEregex}
+\def\nle{nLEregex}
+\def\rel{{\mathscr{L}_{RE}}}
+\def\el{\mathscr{L}_{ERE}}
+\def\lel{\mathscr{L}_{LERE}}
+\def\nlel{\mathscr{L}_{nLERE}}
+\def\lookahead{\text{(?=}}
+\def\nlookahead{\text{(?!~}}
+\def\lookbehind{\text{(?\textless =}}
+\def\nlookbehind{\text{(?\textless !~}}
+
+\title{Moderné regulárne výrazy}
+\author[Tatiana Tóthová]{Tatiana Tóthová \\ \small školiteľ: RNDr. Michal Forišek PhD.}
+\institute{Fakulta matematiky, fyziky a informatiky \\ Univerzita Komenského}
+\date{22.apríla 2015}
+
+\beamertemplatenavigationsymbolsempty 
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\textbf{Motivácia:}
+\begin{itemize}
+\item teoretický model regulárnych výrazov bol v praxi rozšírený o nové konštrukcie
+\end{itemize}
+
+\vspace{20pt}
+\textbf{Cieľ	:}
+\begin{itemize}
+\item preskúmať z hľadiska formálnych jazykov -- Chomského hierarchia, vlastnosti triedy jazykov, zložitosť
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Definícia}
+Regex tvoria \textbf{znaky} a \textbf{metaznaky}
+
+\vspace{10pt}
+Základné operácie:
+\begin{itemize}
+\item $(e_1)(e_2)$ zreťazenie (bez znaku)
+\item $(e_1) | (e_2)$ alternácia
+\item $(e_1)*$ Kleeneho uzáver
+\end{itemize}
+
+Navyše: ľubovoľný znak . , začiatok slova $\textasciicircum$, koniec slova \$
+
+\vspace{10pt}
+Ďalšie operácie: 
+\begin{itemize}
+\item množiny znakov $[abc],[a-z] $
+\item komplementy množín znakov $\left[\textasciicircum abc\right], \left[\textasciicircum a-z\right]$
+\item opakovania $?, \lbrace n\rbrace, \lbrace n,m\rbrace, + $
+\end{itemize}
+
+\vspace{10pt}
+\textbf{Regex má konečnú dĺžku!}
+
+
+\end{frame}
+
+\begin{frame}{Zložitejšie konštrukcie (1)}
+\textbf{Číslovanie zátvoriek} zľava doprava, podľa otváracej zátvorky. Nečíslujú sa konštrukcie (?\dots)
+
+\vspace{20pt}
+\textbf{Spätné referencie $\backslash k$} -- odkazujú sa na $k$-te zátvorky
+$\displaystyle \alpha~ \mathop(_k ~\beta ~\mathop)_k ~\gamma ~\backslash k ~\delta$
+
+$$w = \underbrace{x_1\dots x_{i-1}}_\alpha 
+ \overbrace{\underbrace{x_i\dots x_{j-1}}_{ \displaystyle{\mathop(_k\beta \mathop)_k}}}^{w_k} 
+ \underbrace{x_j\dots x_{l-1}}_\gamma 
+ \overbrace{\underbrace{x_l\dots x_{m-1}}_{\backslash k}}^{w_k}
+ \underbrace{x_{m}\dots x_{n}}_\delta$$
+\vspace{10pt} 
+$$ w_k = x_i\dots x_{j-1} = x_l\dots x_{m-1} $$
+
+\end{frame}
+\begin{frame}{Zložitejšie konštrukcie (2)}
+\textbf{Lookahead} $\lookahead\dots)$ -- nazeranie dopredu:
+$\alpha(?=\beta)\gamma$ $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\overbrace{x_i \dots x_j}^\beta x_{j+1} \dots x_n }_\gamma$$ 
+
+\textbf{Lookbehind} $\lookbehind\dots)$ -- nazeranie dozadu: $\alpha(?<=\beta)\gamma$
+
+$$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
+
+Ich \textbf{negatívne formy} $\nlookahead\dots),\nlookbehind\dots)$ $\rightarrow$ opačná akceptácia (slová, ktoré sa v danom jazyku nenachádzajú)
+\end{frame}
+
+\begin{frame}{Triedy}
+\begin{description}
+\item[Regex] základné operácie a znaky . \textasciicircum ~\$ ( = $\R$)
+\item[Eregex] + spätné referencie
+\item[LEregex] + lookahead, lookbehind
+\item[nLEregex] + negatívny lookahead, negatívny lookbehind
+\end{description}
+\vspace{30pt}
+Triedy jazykov: $\R,~\el,~\lel,~\nlel$
+\end{frame}
+
+\begin{frame}{Hierarchia}
+\begin{block}{Veta}
+Trieda nad $\re$ s pozitívnym a negatívnym lookaroundom je $\R$.
+\end{block}
+
+\vspace{15pt}
+
+\begin{block}{Hierarchia}
+$\R \subsetneq \el \subsetneq \lel \subseteq \nlel \subsetneq \L_{CS}$
+\end{block}
+\begin{block}{}
+$\lel$ a $\nlel$ sú neporovnateľné s $\L_{CF}$
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Pumpovacia lema}
+\begin{block}{Veta}
+Jazyk všetkých platných výpočtov Turingovho stroja patrí do $\lel$.
+\end{block}
+
+\begin{block}{Veta}
+Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$ taký, že neobsahuje lookahead s $\mathdollar$ ani lookbehind s $\textasciicircum$ vnútri iterácie ($*$). Existuje konštanta $N$ taká, že ak $w \in L(\alpha)$ a $\vert w \vert > N$, potom existuje dekompozícia $w=xy$ s nasledujúcimi vlastnosťami:
+\begin{enumerate}[(i)]
+\item $\vert y \vert \geq 1$
+\item $\exists k \in \N,~k\neq 0;~\forall j = 1,2,\ldots: xy^{kj} \in L(\alpha)$
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}{Uzavretosť na zreťazenie}
+\begin{block}{Veta}
+$\lel$ je uzavretá na zreťazenie.
+\end{block}
+\textbf{Dôkaz.} Nech $\alpha,\beta\in\le$. Regex pre $L(\alpha)L(\beta)$ je
+$$
+ \lookahead \mathop(_1 \alpha \mathop)_1 \mathop(_{k+2}\beta \mathop)_{k+2} \mathdollar) ~\alpha ' \backslash k\text{+2}~ \lookbehind ~\textasciicircum\backslash 1~\beta ')
+$$
+\end{frame}
+
+\begin{frame}{Nový formalizmus}
+\begin{itemize}
+\item konfigurácia: $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$
+\item indexovateľné zátvorky
+\item krok výpočtu 
+\\ \vspace{5pt} $\displaystyle{(r_1 \dots \mathop{(}_k \dots \mathop{)}_k\lceil * \dots r_n, w_1 \dots \mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j \dots w_m)}$
+$$(1) ~\vdash(r_1 \dots \mathop{(}_k \dots \mathop{)}_k *\lceil \dots r_n, w_1 \dots \mathop{w_a}^k \dots \mathop{w_b}^{k'} \dots \lceil w_j \dots w_m)$$
+$$(2) ~\vdash(r_1 \dots \mathop{(}_k\lceil \dots \mathop{)}_k * \dots r_n, w_1 \dots w_a \dots w_b \dots \lceil \mathop{w_j}^k \dots w_m)$$
+\item akceptačný výpočet $(\lceil r, \lceil w)\vdash^* (r \lceil, w \lceil)$
+\item jazyk
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dĺžka akceptačného výpočtu}
+\begin{block}{Lema}
+Nech $\alpha \in \e$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
+\end{block}
+
+\vspace{20pt}
+Počet všetkých možných konfigurácií $\alpha\in\le$ je $$O(|\alpha|\cdot|w|^{|\alpha|+2})$$
+Kvôli vlastnostiam lookaroundu lepší odhad nemáme.
+\end{frame}
+
+\begin{frame}{Priestorová zložitosť}
+\begin{block}{Veta.}
+$\lel \subseteq NSPACE(\log n)$
+\end{block}
+\textbf{Dôkaz.} Na páske si pamätáme informáciu z poschodových symbolov -- vo forme adries
+
+\vspace{10pt}
+Zo Savitchovej vety vyplýva: $\lel \subseteq DSPACE(\log^2 n)$
+\begin{block}{Veta}
+$\nlel \subseteq DSPACE(\log^2 n)$
+\end{block}
+\textbf{Dôkaz.} Idea Savitchovej vety, ale s konfiguráciami z formalizmu. Pre každý negatívny lookaround spúšťame nový Turingov stroj s opačnou akceptáciou.
+\end{frame}
+
+\begin{frame}{Regex aj jazyk na vstupe}
+$r=|regex|,~w=|word|$
+\begin{block}{Veta}
+$L(regex\#word) \in NSPACE(r\log w)$, regex $\in \le$
+\end{block}
+\textbf{Dôkaz.} Vyplýva z $\lel \subseteq NSPACE(\log n)$, dĺžka regexu už viac nie je konštanta.
+\begin{block}{Veta}
+Nech počet konfigurácií v akceptačnom výpočte je polynomiálny od $r$ a $w$, potom
+$L(regex\#word) \in DSPACE(r\log^2 w)$, regex~$\in \nobreak\le$
+\end{block}
+\textbf{Dôkaz.} Idea Savitchovej vety, ale s konfiguráciami z formalizmu.
+\end{frame}
+
+\begin{frame}{Na záver}
+\begin{alertblock}{}
+\begin{center}
+\vspace{10pt}
+\large{Ďakujem za pozornosť!}
+\vspace{10pt}
+\end{center}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Problém s lemou 2}
+\begin{block}{Lema 2}
+Nech $\alpha \in \lel,~ s \in L(\alpha),~ r = |\alpha|$ a $w = |s|$. Potom existuje akceptačný výpočet, ktorý má nanajvýš $O(r^2w^3)$ konfigurácií.
+\end{block}
+
+\vspace{10pt}
+Pripomeňme lemu 1
+\begin{block}{Lema 1}
+Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
+\end{block}
+Doplnenie na $\lel$? Funguje len pre regexy s konštantnou hĺbkou vnorenia lookaroundov.
+
+\vspace{5pt}
+Počet všetkých možných konfigurácií je $O(|\alpha|\cdot|w|^{|\alpha|+2})$
+\end{frame}
+
+\begin{frame}{Komplikovanosť lookaheadu s \$ a lookbehindu s \textasciicircum ~ vnútri $*$}
+Napríklad regex
+$$(\lookahead \underbrace{
+ \underbrace{ \lookahead (a^m)*\$ )}_{a^{km},~ k\in\N} 
+ \underbrace{(a^{m+1})* a\lbrace 1,m-1\rbrace \$ ~|~ a^m \$ }_{\text{vie } a* \text{ okrem } a^{m+1},~a^{m(m+1)l},~ l\in\N} 
+ }_{a^{km} \text{ také, že nevie } a^{m(m+1)l}, ~l\in\N }
+  ) a^m)+$$
+generuje konečný jazyk obsahujúci slová 
+\begin{itemize}
+\item $a^m$
+\item $a^{2m}$
+\item \dots
+\item $a^{(m-1)(m+1)}$
+\end{itemize} 
+Hlavný lookahead je spúšťaný každú iteráciu, teda pre slovo $a^{zm}$ musí matchovať všetky $a^{im}$ pre $i\in\lbrace 1,\dots,z\rbrace$.
+\end{frame}
+
+\end{document}
