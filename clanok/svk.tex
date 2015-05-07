@@ -251,7 +251,7 @@ $$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lc
 \textbf{Akceptačný výpočet} je postupnosť konfigurácií $(\lceil R, \lceil W) \vdash^* (R\lceil,
 W\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
-\begin{lemma}
+\begin{lemma}\label{dlzka_vypoctu_rw}
 Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $3\cdot|\alpha|\cdot|w|^2$ konfigurácií.
 \end{lemma}
 \begin{proof}
@@ -264,23 +264,27 @@ V krokoch VIII. a X. sa žiaden ukazovateľ nepohne. Oba kroky sa vyskytujú 1x 
 Z toho vyplýva, že najkratší akceptačný výpočet má najviac $|w|\cdot(|w|+|\alpha|)+|w|\cdot|\alpha| \leq 3\cdot |w|^2 \cdot |\alpha| $ konfigurácií.
 \end{proof}
 
-\begin{lemma}\label{lema_dlzka_post_konfig}
-Nech $\alpha \in \lel,~ s \in L(\alpha),~ r = |\alpha|$ a $w = |s|$. Potom existuje akceptačný výpočet, ktorý má nanajvýš $O(r^2w^3)$ konfigurácií.
+Spočítajme počet všetkých konfigurácií pre triedu regexov $\le$. Vstupné slovo a regex máme, menia sa iba polohy ukazovateľov a informácií. Ukazovateľ v regexe môže mať $(r+1)$ pozícií a pre ukazovateľ v slove existuje $(w+1)$ rôznych pozícií. Čo sa týka ukazovateľa pre spätné referencie a informácií v poschodových symboloch, každý prvok z tejto množiny môže mať $(w+1)$ pozícií alebo sa v slove nenachádzať. Mohutnosť tejto množiny je $m = 1+2\cdot(\text{počet spätných ref.})+(\text{počet lookaroundov})\leq 2r+1$. Počet všetkých možných konfigurácií je dohromady: 
+\begin{equation}\label{pocet_vsetkych_konfig}
+(r+1)(w+1)(w+2)^m \leq (r+1)(w+2)^{2r+2}
+\end{equation}
+$$ = O(rw^{2r+2})$$
+Keby sme priamo pokračovali v dôkaze lemy \ref{dlzka_vypoctu_rw}, odhad by nebol lepší ako odhad \ref{pocet_vsetkych_konfig}. Nasledujúca lema to ukazuje všeobecnejšie.
+
+Definujme si \textbf{hĺbku vnorenia lookaroundov} ako počet lookaroundov vnorených v sebe. Lookaround obsahujúci regex z $\e$ má hĺbku 1. Lookaround obsahujúci regex z $\le$, kde maximum zo všetkých hĺbok lookaroundov je $h-1$ má hĺbku $h$.
+
+\begin{lemma}\label{lema_hlbka_lookaroundov}
+Majme triedu regexov takú, že funkcia $f(r)$ určuje ich maximálnu hĺbku vnorenia lookaroudov, kde $r$ je dĺžka regexu. Potom počet konfigurácií v akceptačnom výpočte pre slovo dĺžky $w$ je najviac $O(rw^2(rw)^{f(r)})$.
 \end{lemma}
 \begin{proof}
-Spočítajme, koľko je všetkých konfigurácií pre regex $\alpha$ a slovo $s$.
+Dokážeme si to matematickou indukciou vzhľadom na hĺbku vnorenia lookaroundov $h$.
 
-Ukazovateľ v regexe môže mať $(r+1)$ rôznych pozícií. Ukazovateľ v slove môže mať $(w+1)$ rôznych pozícií. V slove môžu byť niekedy 2 ukazovatele. Spolu máme $(r+1)(w+1)+(r+1)(w+1)^2 = (r+1)(w+1)(w+2)$ možností.
+Báza indukcie: Nech $h=1$. V regexe je $k\leq r$ lookaroundov, ktoré vnútri nemajú žiaden lookaround. Keďže lookaroundu nie sú priradené žiadne písmenká zo vstupu, môžeme ho brať ako samostatný regex, ktorý v najhoršom prípade matchuje celé $w$. Vnútri každého lookaroundu je regex z $\e$, pre ktorý podľa lemy \ref{dlzka_vypoctu_rw} existuje akceptačný výpočet s najviac $3rw^2$ konfiguráciami. Mimo všetkých lookaroundov je tiež regex, pre ktorý platí táto lema. V najhoršom prípade sa lookaround nachádza vnútri regexu, ktorý je iterovaný $*$ a môže byť spustený najviac $w$-krát. Každý lookaround teda pridá najviac $3rw^3$ konfigurácií. Spolu $3rw^2+r\cdot 3rw^3 = O(r^2w^3) = O(rw^2(rw)^1)$. 
 
-V konfiguráciách sú v poschodových symboloch zapísané informácie potrebné k výpočtu. Pre každé spätné referencie sú to 2 zápisy a pre každý lookaround 1. Dokopy je to najviac $r$ operácií, teda $2r$ zápisov. Každá informácia buď v regexe ešte nie je zapísaná alebo má $w$ možností, kde zapísaná môže byť. Pre informácie máme dokopy $2r(w+1)$ možností.
-
-Všetkých možných konfigurácií je dohromady
-\begin{equation}\label{eq_pocet_konfig}
-(r+1)(w+1)(w+2)\cdot 2r(w+1) = O(r^2w^3)
-\end{equation}
-
-Späť k akceptačnému výpočtu. Nech sú všetky akceptačné výpočty dlhšie ako \eqref{eq_pocet_konfig}. Vyberme si jeden z nich. Potom tento výpočet musí nutne obsahovať 2 rovnaké konfigurácie. Keď vymažeme úsek medzi rovnakými konfiguráciami a napojíme postupnosť, dostaneme opäť validný akceptačný výpočet. Postup opakujeme, pokým výpočet obsahuje nejaké 2 rovnaké konfigurácie. Keď skončíme, stále je validný a všetky konfigurácie vo výpočte sú rôzne a preto má najviac \eqref{eq_pocet_konfig} konfigurácií.
+Indukčný krok: Nech tvrdenie platí pre $h-1$, ukážeme, že platí pre $h$. Regex obsahuje $k\leq r$ lookaroundov s hĺbkou vnorenia najviac $h$. Zoberme si ľubovoľný z týchto lookaroundov. Jeho vnútorný regex obsahuje lookaroundy s hĺbkou vnorenia najviac $h-1$ a podľa indukčného predpokladu takýto regex pridáva $O(rw^2(rw)^{h-1})$ konfigurácií. Pozrime sa teraz na celý regex. Keď ignorujeme lookaroundy, akcetačný výpočet má $3rw^2$ konfigurácií. Každý lookaround pridá $O(rw^2(rw)^{h-1})$ konfigurácií a môže byť spustený najviac $w$-krát, pokiaľ sa nachádza v poli pôsobnosti nejakej $*$. Lookaroundov je najviac $r$, teda dohromady má akceptačný výpočet najviac $3rw^2+rw\cdot O(rw^2(rw)^{h-1}) = O(rw^2(rw)^h)$ konfigurácií, čo sme chceli dokázať.
 \end{proof}
+
+Pre triedu $\le$ je hĺbka vnorenia lookaroundov maximálne dĺžka regexu -- $f(r)=r$, teda akceptačný výpočet môže mať najviac $O(rw^2(rw)^r) = O(r^rw^{r+2})$ konfigurácií. Tento odhad je veľmi podobný odhadu \ref{pocet_vsetkych_konfig}. Druhý extrém je trieda regexov, ktorej lookaroundy majú hĺbku vnorenia konštantnú, teda $f(r)=O(1)$. V takom prípade má akceptačný výpočet najviac $O(rw^2(rw)^{O(1)})$ konfigurácií.
 
 \section{Vlastnosti lookaroundu}
 Na zoznámenie s novou operáciou sme zisťovali správanie sa tried Chomského hierarchie.
