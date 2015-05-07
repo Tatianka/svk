@@ -252,16 +252,16 @@ $$\vdash (r_1\dots \nlookbehind r_{k}\dots r_{l} ) \lceil\dots r_n, w_1\dots \lc
 W\lceil)$. Ak existuje akceptačný výpočet pre daný regex $R$ a slovo $W$ hovoríme, že regex $R$ matchuje slovo $W$ respektívne slovo $W$ vyhovuje regexu $R$. \textbf{Jazyk} vyhovujúci danému regexu je množina slov, pre ktoré existuje akceptačný výpočet.
 \\ \\ Vďaka týmto definíciám sme schopný odhadnúť dĺžku výpočtu:
 \begin{lemma}
-Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
+Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $3\cdot|\alpha|\cdot|w|^2$ konfigurácií.
 \end{lemma}
 \begin{proof}
 Vo väčšine krokov výpočtu sa posúvame dopredu -- buď v regexe alebo v slove alebo v oboch. Takéto kroky vedú k postupnosti dĺžky najviac $|\alpha|+|w|$.
 
-V krokoch VIII. a X. sa žiaden ukazovateľ nepohne. Oba kroky sa vyskytujú 1x ku každej spätnej referencii, ktorých je najviac $|\alpha|$, takže tieto konfigurácie sa objavia najviac $2\cdot|\alpha|$-krát.
+Výpočet môže predĺžiť skákanie ukazovateľa dozadu. V krokoch VI.(2),VII.(2) sa pri Kleeneho $*$ rozhodneme urobiť ďalšiu iteráciu. Zamyslime sa nad samotným akceptačným výpočtom. Ak existuje, potom existuje aj taká jeho verzia, kde každé opakovanie regexu pomocou Kleeneho $*$ matchuje aspoň 1 znak -- prázdne iterácie môžeme vyhodiť, lebo ukazovateľ v slove zostal na mieste a konfigurácia skoku je rovnaká, takže postupnosť sa priamo naviaže. Jediná prázdna iterácia môže zostať ako posledná, pokiaľ sa jedná o krok VII.(2) a na zátvorky pred $*$ sa odkazuje spätná referencia -- vtedy môže nastať prípad, kedy potrebujeme mať posledné matchované podslovo prázdne. Vieme, že regex opakovaný operáciou $*$ je dlhý nanajvýš $|\alpha|$ znakov a podľa úvahy ho treba opakovať najviac $|w|$-krát\footnote{Keď v každej iterácii matchujeme aspoň 1 písmenko, potrebujeme najviac $|w|-1$ návratov. Zarátaním možnej poslednej práznej iterácie dostávame $|w|$ iterácií. }. Medzi návratmi používame nenávratové kroky, ktorých je najviac $|w|+|\alpha|$, takže spolu má akceptačný výpočet najviac $|w|\cdot(|w|+|\alpha|)$ konfigurácií.
 
-Výpočet môže predĺžiť skákanie ukazovateľa dozadu. V krokoch VI.(2),VII.(2) sa pri Kleeneho $*$ rozhodneme urobiť ďalšiu iteráciu. Zamyslime sa nad samotným akceptačným výpočtom. Ak existuje, potom existuje aj taká jeho verzia, kde každé opakovanie regexu pomocou Kleeneho $*$ matchuje aspoň 1 znak -- prázdne iterácie môžeme vyhodiť, lebo ukazovateľ v slove zostal na mieste a konfigurácia skoku je rovnaká, takže postupnosť sa priamo naviaže. Vieme, že regex opakovaný operáciou $*$ je dlhý nanajvýš $|\alpha|$ znakov a podľa úvahy ho treba opakovať najviac $|w|$-krát.
+V krokoch VIII. a X. sa žiaden ukazovateľ nepohne. Oba kroky sa vyskytujú 1x ku každej spätnej referencii, ktorých je najviac $|\alpha|$. Každá spätná referencia sa môže nachádzať v poli pôsobnosti nejakej $*$, teda môže byť opakovaná najviac toľkokrát, koľko je iterácií a tých je dohromady najviac $|w|$. Tieto kroky nastanú najviac $(|\alpha|\cdot|w|)$-krát.
 
-Teda dokopy spravíme najviac $|\alpha|+|w|+2\cdot|\alpha|+|\alpha|\cdot|w| \leq 5\cdot|\alpha|\cdot|w|$ krokov.
+Z toho vyplýva, že najkratší akceptačný výpočet má najviac $|w|\cdot(|w|+|\alpha|)+|w|\cdot|\alpha| \leq 3\cdot |w|^2 \cdot |\alpha| $ konfigurácií.
 \end{proof}
 
 \begin{lemma}\label{lema_dlzka_post_konfig}
@@ -509,7 +509,7 @@ Turingov stroj bude fungovať ako v dôkaze \ref{lere_nspace(logn)}, ale odhad z
 Zo Savitchovej vety vyplýva $DSPACE(r^2\log^2w)$. My vieme dokázať lepšiu zložitosť:
 
 \begin{theorem}\label{regexword_dspace}
-$L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \le$ a $n$ je dĺžka vstupu.
+$L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \e$ a $n$ je dĺžka vstupu.
 \end{theorem}
 \begin{proof} 
 Nech $r=|regex|,~w=|word|$.
@@ -544,7 +544,24 @@ Riadok 2 je porovnanie rovnosti adries -- ktoré symboly už porovnal si môže 
 Indexovateľnosť a ukazovateľ sa skontrolujú bez použitia pomocnej pamäte. Adresy využívajú porovnávanie, ale to sme už popísali, že si vieme vypomôcť poschodovými symbolmi. Alternovateľnosť využíva algoritmus na kontrolu zátvoriek -- zisťuje, či je alternácia uzavretá zátvorkami (ak hej, ktorými) alebo nie. Počet zátvoriek je najviac $\frac{r}{2}$. Používame algoritmus, kde zátvorke ( priradíme 1 a ) hodnotu -1. Pri každom výskyte sa hodnoty sčítavajú, 0 je dobre uzátvorkovaný výraz.\footnote{Ak počítame sprava doľava, hodnoty zátvoriek prenásobíme $(-1)$, aby sme pri prvej zátvorke nemali súčet rovný -1.} Kontrola sa vykoná a súčet po nej už nepotrebujeme, preto ho môžeme dočasne zapísať na koniec zásobníka a vzápätí vymazať. Zapísaná pamäť tak bude $r+O(n\log^2n)=O(n\log^2n)$.
 \end{proof}
 
-Tu už nasleduje sľubovaný dôkaz vety \ref{nlel_dspace}. Budeme čerpať z dôkazu predošlej vety.
+\begin{corollary}
+Nech $\cal U$ je trieda regexov, pre ktoré platí, že počet konfigurácií v~akceptačnom výpočte pre regex $\alpha$ a slovo $w$ je najviac $f(n)$, kde $n=|\alpha|+|w|+1$. Potom $L(regex\#word)\in DSPACE(n\cdot\log n\cdot \log (f(n)))$, kde $regex \in \cal U$.
+\end{corollary}
+\begin{proof}
+Vyplýva z dôkazu vety \ref{regexword_dspace} -- hĺbka vnorenia funkcie $TESTUJ$ je logaritmus z horného ohraničenia dĺžky akceptačného výpočtu.
+\end{proof}
+
+\begin{corollary}
+Trieda regexov s hĺbkou vnorenia look\-aroundov zhora ohraničenou konštantou $h$ patrí do $DSPACE(n\log^2 n)$.
+\end{corollary}
+\begin{proof}
+Podľa lemy \ref{lema_hlbka_lookaroundov} je počet konfigurácií v akceptačnom výpočte najviac $O((rw)^h)$. Potom hĺbka rekurzie funkcie $TESTUJ$ je 
+$$\log((rw)^h) = h\log r + h\log w = O(\log r+\log w)$$ 
+A to je ten istý odhad ako v dôkaze vety \ref{regexword_dspace}.
+\end{proof}
+\todo
+
+Tu už nasleduje sľubovaný dôkaz vety \ref{nlel_dspace}. Budeme čerpať z dôkazu predošlej vety \ref{regexword_dspace}.
 \begin{proof}
 Nech $\alpha\in\nle$ a $r=|\alpha|$. Zostrojíme Turingov stroj $T$, ktorý bude akceptovať $L(\alpha)$ a na pracovných páskach zapíše najviac $O(\log^2 n)$ políčok.
 
