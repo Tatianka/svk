@@ -81,7 +81,7 @@ Ako čoskoro zistíme, nové regulárne výrazy vedia reprezentovať zložitejš
 
 \subsection{Základná definícia}
 
-Regulárne výrazy sú zložené zo znakov a metaznakov. Znak $a$ predstavuje jazyk $L(a)=\lbrace a \rbrace$. Metaznak alebo skupina metaznakov určuje, aká operácia sa so znakmi udeje. Základné operácie sú zreťazenie (je definované tým, že regulárne výrazy idú po sebe, bez metaznaku), Kleeneho uzáver ($(0-\infty)$-krát zopakuj výraz, metaznak $*$) a alternácia (vyber výraz naľavo alebo napravo, metaznak~$|$~). Naviac sa využíva metaznak $\backslash$, ktorý robí z metaznakov obyčajné znaky a okrúhle zátvorky na logické oddelenie regulárnych výrazov.
+Regulárne výrazy sú zložené zo znakov a metaznakov. Znak $a$ predstavuje jazyk $L(a)=\lbrace a \rbrace$. Metaznak alebo skupina metaznakov určuje, aká operácia sa so~znakmi udeje. Základné operácie sú zreťazenie (je definované tým, že regulárne výrazy idú po sebe, bez metaznaku), Kleeneho uzáver ($(0-\infty)$-krát zopakuj výraz, metaznak $*$) a alternácia (vyber výraz naľavo alebo napravo, metaznak~$|$~). Naviac sa využíva metaznak $\backslash$, ktorý robí z metaznakov obyčajné znaky a okrúhle zátvorky na logické oddelenie regulárnych výrazov.
 
 Pre regulárny výraz $\alpha$ a slovo $w\in L(\alpha)$ hovoríme, že $\alpha$ vyhovuje slovu $w$ resp. $\alpha$ matchuje slovo $w$. Tiež budeme hovoriť, že $\alpha$ generuje jazyk $L(\alpha)$.
 
@@ -106,22 +106,22 @@ Rozdiely medzi minimalistickou a greedy verziou operácií vníma iba používat
 
 \subsection{Zložitejšie konštrukcie}
 \subsubsection*{Spätné referencie}
-Najprv potrebujeme očíslovať všetky zátvorky v regexe. Číslujú sa všetky, ktoré nie sú tvaru $(?\dots)$. Poradie je určnené podľa otváracej zátvorky.
+Najprv potrebujeme očíslovať všetky zátvorky v regexe. Číslujú sa všetky, ktoré nie sú tvaru $(?\dots)$. Poradie je určované zľava doprava podľa otváracej zátvorky.
 
-Spätné referencie umožňujú odkazovať sa na konkrétne zátvorky. Zápis je $\backslash k$ a môže sa nachádzať až za $k$-tymi zátvorkami. Skutočná hodnota $\backslash k$ sa určí až počas výpočtu -- predstavuje podslovo zo vstupného slova, ktoré matchovali $k$-te zátvorky. Ak je takých viac, platí vždy to posledné. Regex $\alpha(\beta)\gamma\backslash k\delta$ na $w$:
-$$w = \underbrace{x_1\dots x_{i-1}}_\alpha 
- \overbrace{\underbrace{x_i\dots x_{j-1}}_{ \displaystyle{\mathop(_k\beta \mathop)_k}}}^{w_k} 
- \underbrace{x_j\dots x_{l-1}}_\gamma 
- \overbrace{\underbrace{x_l\dots x_{m-1}}_{\backslash k}}^{w_k}
- \underbrace{x_{m}\dots x_{n}}_\delta$$
- $$ x_i\dots x_{j-1} = x_l\dots x_{m-1} $$
+Spätné referencie umožňujú odkazovať sa na konkrétne zátvorky. Zápis je $\backslash k$ a môže sa nachádzať až za $k$-tymi zátvorkami. Skutočná hodnota $\backslash k$ sa určí až počas výpočtu -- predstavuje podslovo zo vstupného slova, ktoré matchovali $k$-te zátvorky. Ak je takých viac, platí vždy to posledné. Regex $\displaystyle\alpha\mathop{(}_k\beta\mathop{)}_k\gamma\backslash k\delta$ na $w$:
+$$w = \underbrace{x_1\dots x_{i-1}}_{\displaystyle\alpha} 
+ \overbrace{\underbrace{x_i\dots x_{j-1}}_{ \displaystyle{\mathop(_k\beta \mathop)_k}}}^{\displaystyle w_k} 
+ \underbrace{x_j\dots x_{l-1}}_{\displaystyle\gamma} 
+ \overbrace{\underbrace{x_l\dots x_{m-1}}_{\displaystyle\backslash k}}^{\displaystyle w_k}
+ \underbrace{x_{m}\dots x_{n}}_{\displaystyle\delta}$$
+ $$\text{platí ~~ } w_k=x_i\dots x_{j-1} = x_l\dots x_{m-1} $$
 
 \subsubsection*{Lookahead}
 Zapísaný formou $\lookahead \dots)$, vnútri je validný regex.
 
 Keď v regexe prídeme na pozíciu lookaheadu, zoberieme regex vo vnútri a snažíme sa v slove matchovať ľubovoľný prefix zostávajúcej časti slova. Ak sa to podarí, pokračujeme vo vonkajšom regexe ďalej a v slove od pozície, kde lookahead začínal (tzn. akokeby v regexe nikdy nebol).
 Regex $\alpha\lookahead\beta)\gamma$:
- $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\overbrace{x_i \dots x_j}^\beta x_{j+1} \dots x_n }_\gamma$$ 
+ $$w = \underbrace{x_1\dots x_{i-1}}_{\displaystyle\alpha} \underbrace{\overbrace{x_i \dots x_j}^{\displaystyle\beta} x_{j+1} \dots x_n }_{\displaystyle\gamma}$$ 
 
 Má aj negatívnu verziu -- negatívny lookahead $\nlookahead \dots)$. Vykonáva sa rovnako ako lookahead, ale má opačnú akceptáciu. Teda ak neexistuje vyhovujúci prefix, akceptuje.
 
@@ -129,14 +129,14 @@ Má aj negatívnu verziu -- negatívny lookahead $\nlookahead \dots)$. Vykonáva
 Zapísaný formou $\lookbehind \dots)$, vnútri je validný regex.
 
 Pri výpočte zoberieme regex vnútri lookbehindu a snažíme sa vyhovieť ľubovoľnému sufixu už matchovanej časti slova. Ak vyhovieme, pokračujeme v slove a regexe akoby tam lookbehind vôbec nebol. Regex $\alpha\lookbehind\beta)\gamma$ matchuje slovo $w$:
-$$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
+$$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^{\displaystyle\beta}}_{\displaystyle\alpha} \underbrace{x_{j+1} \dots x_n }_{\displaystyle\gamma}$$
 
 Aj lookbehind má negatívnu verziu -- negatívny lookbehind $\nlookbehind \dots)$ -- a má otočenú akceptáciu podobne ako negatívny lookahead.
 \\ \\ Lookahead a lookbehind (spolu nazývané jedným slovom \textbf{lookaround}) sú v rôznych implementáciách rôzne obmedzované, aby výpočet netrval príliš dlho. V teórii tieto obmedzenia ignorujeme a prezentujeme model v plnej sile -- výsledky tak prezentujú hornú hranicu toho, čo implemetnácie dokážu. 
 
 \subsection{Priorita}
 
-Pri interakcii toľkých operácií je nutné vedieť ich priority. Existujú také, ktoré sa správajú ako znak, čomu zodpovedajú [ ],[\textasciicircum ~], . a každá spätná referencia. Špeciálne sú lookahead a lookbehind -- tie sa vykonajú hneď akonáhle na ne narazíme. Ostatné zoradíme v tabuľke: 
+Pri interakcii toľkých operácií je nutné vedieť ich priority. Existujú také, ktoré sa správajú ako znak, čomu zodpovedajú [ ],[\textasciicircum ~], . a každá spätná referencia. Špeciálne sú lookahead a lookbehind -- tie sa vykonajú hneď ako na ne narazíme. Ostatné zoradíme v tabuľke: 
 
 \begin{center}
 \begin{tabular}{|c||c|c|c|c|}
@@ -150,20 +150,21 @@ operácia & () & $*$ + ? $\lbrace \rbrace$ & zreťazenie & | \\ \hline
 \subsection{Triedy a množiny}
 Kvôli porovnávaniu a vytvoreniu hierarchie sme rozdelili operácie do niekoľkých množín:
 \begin{description}
-\item[$\re$] -- množina operácií, pomocou ktorých vieme popísať iba regulárne jazyky; presnejšie všetky znaky a metaznaky (bez zložitejších operácií)
-\item[$\e$] -- $\re$ so spätnými referenciami
-\item[$\le$] -- $\e$ s pozitívnym lookaroundom
-\item[$\nle$] -- $\le$ s negatívnym lookaroundom
-\item[$\rel$] -- trieda jazykov nad $\re$ ($= \R$)
-\item[$\el$] -- trieda jazykov nad $\e$
-\item[$\lel$] -- trieda jazykov nad $\le$
-\item[$\nlel$] -- trieda jazykov nad $\nle$
+\setlength\itemsep{0em}
+\item $\re$ -- regexy nad množinou operácií, ktorými vieme popísať iba regulárne jazyky (základná definícia)
+\item $\e$ -- $\re$ so spätnými referenciami
+\item $\le$ -- $\e$ s pozitívnym lookaroundom
+\item $\nle$ -- $\le$ s negatívnym lookaroundom
+\item $\rel$ -- trieda jazykov nad $\re$ ($= \R$)
+\item $\el$ -- trieda jazykov nad $\e$
+\item $\lel$ -- trieda jazykov nad $\le$
+\item $\nlel$ -- trieda jazykov nad $\nle$
 \end{description}
 
 Trieda $\el$ už bola hlbšie preskúmaná a výsledky čerpáme z článkov \cite{ExtendedRegexPower} a \cite{ExtendedRegexIntersec}.
  
 \section{Formalizácia modelu}
-Pri zložitejších dôkazoch sa ukázala potreba lepšieho formalizmu, než len množiny operácií. Kvôli jednoduchosti sme vybrali len potrebné operácie -- zreťazenie, alternáciu, Kleeneho $*$, spätné referencie a pozitívny a negatívny lookaround -- a pokúsili sa tu popísať model, ktorý pracuje v krokoch podobne ako Turingov stroj.
+Pri zložitejších dôkazoch sa ukázala potreba lepšieho formalizmu, než len množiny operácií. Kvôli jednoduchosti sme vybrali len potrebné operácie -- zreťazenie, alternáciu, Kleeneho $*$, spätné referencie a pozitívny a negatívny lookaround -- a pokúsili sa popísať model, ktorý pracuje v krokoch podobne ako Turingov stroj.
 
 Základným prvkom je \textbf{konfigurácia}. Je to dvojica regex $r_1 \dots r_n$ a vstupné slovo $w_1 \dots w_m$, pričom v oboch reťazcoch sa navyše nachádza ukazovateľ pozície $\lceil$ (ako hlava Turingovho stroja): $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$. Špeciálne rozoznávame počiatočnú konfiguráciu $(\lceil r_1 \dots r_n,\lceil w_1 \dots w_m)$ a akceptačnú konfiguráciu $(r_1 \dots r_n \lceil, w_1 \dots w_m \lceil)$.
 
@@ -174,7 +175,7 @@ Najprv si definujeme potrebné pojmy indexovateľnosti a alternovateľnosti. \te
 Vďaka definovaniu týchto pojmov vidíme, že vieme algoritmicky zistiť, ktoré zátvorky sú indexovateľné a ktoré regexy sú alternovateľné.
 
 \begin{definition}\label{dfkonfig}
-\textbf{Krok výpočtu} je relácia $\vdash$ na konfiguráciách definovaná nasledovne:
+\textbf{Krok výpočtu} je relácia ~$\vdash$~ na konfiguráciách definovaná nasledovne:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{enumerate}[I.]
 \item \underline{zhoda písmenka}
@@ -264,7 +265,7 @@ V krokoch VIII. a X. sa žiaden ukazovateľ nepohne. Oba kroky sa vyskytujú 1x 
 Z toho vyplýva, že najkratší akceptačný výpočet má najviac $|w|\cdot(|w|+|\alpha|)+|w|\cdot|\alpha| \leq 3\cdot |w|^2 \cdot |\alpha| $ konfigurácií.
 \end{proof}
 
-Spočítajme počet všetkých konfigurácií pre triedu regexov $\le$. Vstupné slovo a regex máme, menia sa iba polohy ukazovateľov a informácií. Ukazovateľ v regexe môže mať $(r+1)$ pozícií a pre ukazovateľ v slove existuje $(w+1)$ rôznych pozícií. Čo sa týka ukazovateľa pre spätné referencie a informácií v poschodových symboloch, každý prvok z tejto množiny môže mať $(w+1)$ pozícií alebo sa v slove nenachádzať. Mohutnosť tejto množiny je $m = 1+2\cdot(\text{počet spätných ref.})+(\text{počet lookaroundov})\leq 2r+1$. Počet všetkých možných konfigurácií je dohromady: 
+Spočítajme počet všetkých konfigurácií pre triedu regexov $\le$. Vstupné slovo a regex máme, menia sa iba polohy ukazovateľov a informácií. Ukazovateľ v regexe môže mať $(r+1)$ pozícií a pre ukazovateľ v slove existuje $(w+1)$ rôznych pozícií. Čo sa týka ukazovateľa pre spätné referencie a informácií v poschodových symboloch, každý prvok z tejto množiny môže mať $(w+1)$ pozícií alebo sa v slove nenachádza. Mohutnosť tejto množiny je $m = 1+2\cdot(\text{počet spätných ref.})+(\text{počet lookaroundov})\leq 2r+1$. Počet všetkých možných konfigurácií je dohromady: 
 \begin{equation}\label{pocet_vsetkych_konfig}
 (r+1)(w+1)(w+2)^m \leq (r+1)(w+2)^{2r+2}
 \end{equation}
@@ -531,7 +532,7 @@ bool $TESTUJ(C_1,C_2,i)$
 \end{lstlisting}
 Konfigurácie budú zodpovedať formálnemu modelu a ako v predošlom dôkaze budú na páske zaznamenané v podobe niekoľkých adries za sebou -- ukazovateľ v regexe, ukazovateľ v slove, začiatok a koniec podslova pre $k$-te indexovateľné zátvorky pre $\forall k$ $(z)$, začiatok každého lookaheadu $(l_a)$ a lookbehindu $(l_b)$. Globálne si budeme pamätať ešte aktuálnu pozíciu v regexe a v slove, kvôli orientácii a prípadnému kopírovaniu adries. Spolu to zaberie $\log r+(1+2z+l_a+l_b)\cdot \log w + \log r+\log w \leq O(r\log w)$ pamäte.
 
-Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z lemy \ref{lema_dlzka_post_konfig}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
+Turingov stroj T začne volaním inštancie $TESTUJ(C_0,C_a,c)$, kde $C_0$ je počiatočná konfigurácia, $C_a$ je akceptačná konfigurácia a $c$ je číslo z lemy \ref{dlzka_vypoctu_rw}. Ak akceptačný výpočet existuje, potom existuje aj taký, ktorý má nanajvýš $c$ konfigurácií.
 
 Procedúra $TESTUJ$ je rekurzívna. Preto bude na pracovnej páske stroja T zásobník. Pre každú inštanciu procedúry bude mať uložené konfigurácie $C_1, C_2, C_3, c$ a informáciu, či sa vrátil z prvého alebo druhého volania (potrebný 1 bit informácie). Hodnotu $c$ vieme zapísať do priestoru $\log c = O(\log r + \log w)$, teda záznam pre 1 inštanciu procedúry zaberie $3r\log w + \log c = O(r\log w)$ pamäte. 
 
@@ -572,7 +573,7 @@ Pokiaľ $\alpha$ neobsahuje negatívny lookaround, tvrdenie triviálne vyplýva 
 
 $T$ bude skonštruovaný ako Turingov stroj vo vete \ref{regexword_dspace}, pričom musíme dodefinovať správanie v prípade negatívneho lookaroundu. V definícii \ref{dfkonfig} v bodoch XV. a XIV. je napísané, že ak splníme istú podmieku, negatívny lookaround možno preskočiť a pokračovať ďalej vo výpočte. Podmienka začína ,,neexistuje výpočet'', čo naznačuje, že musíme vyskúšať všetky možnosti postupnosti konfigurácií -- teda mať deterministický algoritmus, ktorý akceptuje práve vtedy, keď akceptačný výpočet existuje.
 
-Vhodným algoritmom je procedúra $TESTUJ$. Zakaždým, keď $T$ bude overovať podmienku $C_1\mathop{\vdash}^? C_2$ a jedná sa o prechod XV. alebo XIV. z definície \ref{dfkonfig}, stane sa nasledovné. $T$ spustí na novej páske novú procedúru $TESTUJ(C_0',C_a',c')$, kde $C_0'$ je počiatočná a $C_a'$ akceptačná konfigurácia z definície daného kroku a $c' \leq c$ je hodnota z lemy \ref{lema_dlzka_post_konfig} pre regex vo vnútri tohto negatívneho lookaroundu. Túto procedúru treba spustiť niekoľkokrát po sebe -- pre každé $p$, čo prichádza do úvahy. Pokiaľ niektorý z behov procedúry $TESTUJ$ skončí úspešne, znamená to, že existuje akceptačný výpočet tam, kde nechceme, aby existoval -- podmienka negatívneho lookaroundu neplatí a výsledok je $C_1\nvdash C_2$. Ak všetky behy skončia s výsledkom \textit{false}, výsledok je $C_1\vdash C_2$.
+Vhodným algoritmom je procedúra $TESTUJ$. Zakaždým, keď $T$ bude overovať podmienku $C_1\mathop{\vdash}^? C_2$ a jedná sa o prechod XV. alebo XIV. z definície \ref{dfkonfig}, stane sa nasledovné. $T$ spustí na novej páske novú procedúru $TESTUJ(C_0',C_a',c')$, kde $C_0'$ je počiatočná a $C_a'$ akceptačná konfigurácia z definície daného kroku a $c' \leq c$ je hodnota z lemy \ref{dlzka_vypoctu_rw} pre regex vo vnútri tohto negatívneho lookaroundu. Túto procedúru treba spustiť niekoľkokrát po sebe -- pre každé $p$, čo prichádza do úvahy. Pokiaľ niektorý z behov procedúry $TESTUJ$ skončí úspešne, znamená to, že existuje akceptačný výpočet tam, kde nechceme, aby existoval -- podmienka negatívneho lookaroundu neplatí a výsledok je $C_1\nvdash C_2$. Ak všetky behy skončia s výsledkom \textit{false}, výsledok je $C_1\vdash C_2$.
 
 Vynechali sme detail ,,spustenie pre každé p, čo prichádza do úvahy''. Tu je treba zadať hranice podslova, na ktorom procedúra pracuje, a neprekročiť ich. Jednoducho zakomponujeme do procedúry kontrolu, či sú všetky adresy a ukazovateľ pre toto spustenie v povolenom intervale. Tieto hodnoty budú globálne a zapíšu sa pri prvom volaní na začiatok zásobníka. Pre hlavný beh procedúry to budú hodnoty 0 a $n+2$ (t.j. interval $\langle 0,n+2)$).
 
