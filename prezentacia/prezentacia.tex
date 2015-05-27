@@ -38,7 +38,7 @@
 \title{Moderné regulárne výrazy}
 \author[Tatiana Tóthová]{Tatiana Tóthová \\ \small školiteľ: RNDr. Michal Forišek PhD.}
 \institute{Fakulta matematiky, fyziky a informatiky \\ Univerzita Komenského}
-\date{22.apríla 2015}
+\date{28.mája 2015}
 
 \beamertemplatenavigationsymbolsempty 
 \begin{document}
@@ -112,6 +112,19 @@ $\alpha(?=\beta)\gamma$ $$w = \underbrace{x_1\dots x_{i-1}}_\alpha \underbrace{\
 $$w = \underbrace{x_1\dots x_{i-1} \overbrace{x_i \dots x_j}^\beta}_\alpha \underbrace{x_{j+1} \dots x_n }_\gamma$$
 
 Ich \textbf{negatívne formy} $\nlookahead\dots),\nlookbehind\dots)$ $\rightarrow$ opačná akceptácia (slová, ktoré sa v danom jazyku nenachádzajú)
+\end{frame}
+
+\begin{frame}{Príklady}
+\begin{itemize}
+\item ${\lookahead (a^m)*\$)(a^{m+1})*}$
+$$L_1 = \lbrace a^{im(m+1)}~|~i\in\N_0\rbrace$$
+$$\text{iný možný zápis } \rightarrow (a^{m(m+1)})*$$
+\item $(a*)\#\lookahead(\backslash 1)*\$)(a\backslash 1)*$
+$$L = \lbrace a^m\# a^{im(m+1)} ~|~ i\in\N_0\rbrace$$
+\vspace{10pt}
+\item ${ \left(\lookahead (a^{m+1})* a\lbrace 1,m-1\rbrace \$ ~|~ a^m \$)~ a^m\right)+ }$
+$$L_2 = \lbrace a^m,a^{2m}, \dots, a^{m^2} \rbrace$$
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Triedy}
