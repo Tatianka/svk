@@ -120,10 +120,10 @@ Ich \textbf{negatívne formy} $\nlookahead\dots),\nlookbehind\dots)$ $\rightarro
 $$L_1 = \lbrace a^{im(m+1)}~|~i\in\N_0\rbrace$$
 $$\text{iný možný zápis } \rightarrow (a^{m(m+1)})*$$
 \item $(a*)\#\lookahead(\backslash 1)*\$)(a\backslash 1)*$
-$$L = \lbrace a^m\# a^{im(m+1)} ~|~ i\in\N_0\rbrace$$
+$$L_2 = \lbrace a^m\# a^{im(m+1)} ~|~ i\in\N_0\rbrace$$
 \vspace{10pt}
 \item ${ \left(\lookahead (a^{m+1})* a\lbrace 1,m-1\rbrace \$ ~|~ a^m \$)~ a^m\right)+ }$
-$$L_2 = \lbrace a^m,a^{2m}, \dots, a^{m^2} \rbrace$$
+$$L_3 = \lbrace a^m,a^{2m}, \dots, a^{m^2} \rbrace$$
 \end{itemize}
 \end{frame}
 
@@ -138,10 +138,21 @@ $$L_2 = \lbrace a^m,a^{2m}, \dots, a^{m^2} \rbrace$$
 Triedy jazykov: $\R,~\el,~\lel,~\nlel$
 \end{frame}
 
+\begin{frame}{Uzavretosť na zreťazenie}
+\begin{block}{Veta}
+$\lel$ je uzavretá na zreťazenie.
+\end{block}
+\textbf{Dôkaz.} Nech $\alpha,\beta\in\le$. Regex pre $L(\alpha)L(\beta)$ je
+$$
+ \lookahead \mathop(_1 \alpha \mathop)_1 \mathop(_{k+2}\beta \mathop)_{k+2} \mathdollar) ~\alpha ' \backslash k\text{+2}~ \lookbehind ~\textasciicircum\backslash 1~\beta ')
+$$
+\end{frame}
+
 \begin{frame}{Hierarchia}
 \begin{block}{Veta}
 Trieda nad $\re$ s pozitívnym a negatívnym lookaroundom je $\R$.
 \end{block}
+Neobsahuje spätné referencie!
 
 \vspace{15pt}
 
@@ -168,16 +179,6 @@ Nech $\alpha\in\le$ nad unárnou abecedou $\Sigma = \lbrace a \rbrace$ taký, ž
 \end{block}
 \end{frame}
 
-\begin{frame}{Uzavretosť na zreťazenie}
-\begin{block}{Veta}
-$\lel$ je uzavretá na zreťazenie.
-\end{block}
-\textbf{Dôkaz.} Nech $\alpha,\beta\in\le$. Regex pre $L(\alpha)L(\beta)$ je
-$$
- \lookahead \mathop(_1 \alpha \mathop)_1 \mathop(_{k+2}\beta \mathop)_{k+2} \mathdollar) ~\alpha ' \backslash k\text{+2}~ \lookbehind ~\textasciicircum\backslash 1~\beta ')
-$$
-\end{frame}
-
 \begin{frame}{Nový formalizmus}
 \begin{itemize}
 \item konfigurácia: $(r_1\dots \lceil r_i\dots r_n,w_1 \dots \lceil w_j \dots w_m)$
@@ -192,13 +193,17 @@ $$(2) ~\vdash(r_1 \dots \mathop{(}_k\lceil \dots \mathop{)}_k * \dots r_n, w_1 \
 \end{frame}
 
 \begin{frame}{Dĺžka akceptačného výpočtu}
-\begin{block}{Lema}
-Nech $\alpha \in \e$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
+\begin{block}{Lema 1}
+Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $3\cdot|\alpha|\cdot|w|^2$ konfigurácií.
 \end{block}
 
 \vspace{20pt}
-Počet všetkých možných konfigurácií $\alpha\in\le$ je $$O(|\alpha|\cdot|w|^{|\alpha|+2})$$
-Kvôli vlastnostiam lookaroundu lepší odhad nemáme.
+Počet všetkých možných konfigurácií $\alpha\in\le$ je najviac
+$$ (r+1)(w+2)^{2r+2} = O(rw^{2r+2})$$
+
+\begin{block}{Lema 2}
+Majme triedu regexov takú, že funkcia $\bm{f(r)}$ určuje ich \textbf{maximálnu hĺbku vnorenia lookaroudov}, kde $r$ je dĺžka regexu. Potom počet konfigurácií v akceptačnom výpočte pre slovo dĺžky $w$ je najviac $O(rw^2(rw)^{f(r)})$.
+\end{block}
 \end{frame}
 
 \begin{frame}{Priestorová zložitosť}
@@ -222,10 +227,22 @@ $L(regex\#word) \in NSPACE(r\log w)$, regex $\in \le$
 \end{block}
 \textbf{Dôkaz.} Vyplýva z $\lel \subseteq NSPACE(\log n)$, dĺžka regexu už viac nie je konštanta.
 \begin{block}{Veta}
-Nech počet konfigurácií v akceptačnom výpočte je polynomiálny od $r$ a $w$, potom
-$L(regex\#word) \in DSPACE(r\log^2 w)$, regex~$\in \nobreak\le$
+$L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \e$.
 \end{block}
-\textbf{Dôkaz.} Idea Savitchovej vety, ale s konfiguráciami z formalizmu.
+\textbf{Dôkaz.} Idea Savitchovej vety, ale s konfiguráciami z formalizmu. Hĺbku rekurzie algoritmu vieme zhora ohraničiť pomocou lemy 1 ($3\cdot|regex|\cdot|word|^2$).
+\end{frame}
+
+\begin{frame}{Dôsledky}
+\begin{block}{Veta}
+$L(regex\#word) \in DSPACE(n \log^2 n)$, kde $regex \in \e$.
+\end{block}
+\begin{block}{Dôsledok}
+Nech $\cal U$ je trieda regexov, pre ktoré platí, že počet konfigurácií v~akceptačnom výpočte pre regex $regex$ a slovo $word$ je najviac $f(n)$, kde $n=r+w+1$. Potom pre $regex \in \cal U$ platí
+$L(regex\#word)\in DSPACE(n\cdot\log n\cdot \log (f(n)))$.
+\end{block}
+\begin{block}{Dôsledok}
+Trieda regexov s hĺbkou vnorenia lookaroundov zhora ohraničenou konštantou $h$ patrí do $DSPACE(n\log^2 n)$.
+\end{block}
 \end{frame}
 
 \begin{frame}{Na záver}
@@ -236,39 +253,6 @@ $L(regex\#word) \in DSPACE(r\log^2 w)$, regex~$\in \nobreak\le$
 \vspace{10pt}
 \end{center}
 \end{alertblock}
-\end{frame}
-
-\begin{frame}{Problém s lemou 2}
-\begin{block}{Lema 2}
-Nech $\alpha \in \lel,~ s \in L(\alpha),~ r = |\alpha|$ a $w = |s|$. Potom existuje akceptačný výpočet, ktorý má nanajvýš $O(r^2w^3)$ konfigurácií.
-\end{block}
-
-\vspace{10pt}
-Pripomeňme lemu 1
-\begin{block}{Lema 1}
-Nech $\alpha \in \el$ a $w \in L(\alpha)$. Potom existuje akceptačný výpočet, ktorý má najviac $5\cdot|\alpha|\cdot|w|$ konfigurácií.
-\end{block}
-Doplnenie na $\lel$? Funguje len pre regexy s konštantnou hĺbkou vnorenia lookaroundov.
-
-\vspace{5pt}
-Počet všetkých možných konfigurácií je $O(|\alpha|\cdot|w|^{|\alpha|+2})$
-\end{frame}
-
-\begin{frame}{Komplikovanosť lookaheadu s \$ a lookbehindu s \textasciicircum ~ vnútri $*$}
-Napríklad regex
-$$(\lookahead \underbrace{
- \underbrace{ \lookahead (a^m)*\$ )}_{a^{km},~ k\in\N} 
- \underbrace{(a^{m+1})* a\lbrace 1,m-1\rbrace \$ ~|~ a^m \$ }_{\text{vie } a* \text{ okrem } a^{m+1},~a^{m(m+1)l},~ l\in\N} 
- }_{a^{km} \text{ také, že nevie } a^{m(m+1)l}, ~l\in\N }
-  ) a^m)+$$
-generuje konečný jazyk obsahujúci slová 
-\begin{itemize}
-\item $a^m$
-\item $a^{2m}$
-\item \dots
-\item $a^{(m-1)(m+1)}$
-\end{itemize} 
-Hlavný lookahead je spúšťaný každú iteráciu, teda pre slovo $a^{zm}$ musí matchovať všetky $a^{im}$ pre $i\in\lbrace 1,\dots,z\rbrace$.
 \end{frame}
 
 \end{document}
